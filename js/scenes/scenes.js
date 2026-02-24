@@ -30,7 +30,8 @@ export default () => {
          { name: "forest"          , path: "./forest.js"          , public: true }, // This scene is for HW 2 as well
          { name: "custom_flag"     , path: "./custom_flag.js"     , public: true },
          { name: "custom_bouncing" , path: "./custom_bouncing.js" , public: true },
-         { name: "chess"           , path: "./chess.js"           , public: true }, // This scene is for HW 3   
+         { name: "chess"           , path: "./chess.js"           , public: true }, // This scene is for HW 3, 4, and 5
+         { name: "clock"           , path: "./clock.js"           , public: true }, // This scene is for HW 5 as well
       ]
    };
 }
