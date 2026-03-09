@@ -21,6 +21,12 @@ How to use in browser console:
 Requirements:
 - /api/aiquery must be available on the running server.
 - OPENAI_API_KEY must be set in .env for server/main.js.
+   If .env does not exist yet, from project root run:
+      cat > .env << 'EOF'
+      OPENAI_API_KEY=your_key
+      EOF
+   If .env already exists, append key with:
+      echo 'OPENAI_API_KEY=your_key' >> .env
 */
 
 export const init = async model => {
