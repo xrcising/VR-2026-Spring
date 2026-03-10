@@ -28,6 +28,11 @@ export default () => {
          { name: "master1"      , path: "./master1.js"      , public: true },
          { name: "bouncing"     , path: "./bouncing.js"     , public: true },
          { name: "parse1"       , path: "./parse1.js"       , public: true },
+         { name: "beam"         , path: "./beam.js"         , public: true },
+         { name: "headGaze"     , path: "./headGaze.js"     , public: true },
+         { name: "reading"      , path: "./reading.js"      , public: true },
+         { name: "parse2"       , path: "./parse2.js"       , public: true },
+         { name: "parse3"       , path: "./parse3.js"       , public: true },
 
          // My scenes
          { name: "text_world"      , path: "./text_world.js"      , public: true },
@@ -39,10 +44,7 @@ export default () => {
          { name: "chess"           , path: "./chess.js"           , public: true }, // This scene is for HW 3, 4, and 5
          { name: "clock"           , path: "./clock.js"           , public: true }, // This scene is for HW 5 as well
          
-         { name: "beam"         , path: "./beam.js"         , public: true },
-         { name: "headGaze"     , path: "./headGaze.js"     , public: true },
-         { name: "reading"      , path: "./reading.js"      , public: true },
-         { name: "parse2"       , path: "./parse2.js"       , public: true },
+         
       ]
    };
 }
