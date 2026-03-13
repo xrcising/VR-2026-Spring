@@ -1,8 +1,9 @@
+// In class practice using clay.text
+// This is a simple keyboard
+
 import { texts } from "../util/texts.js";
 
 let my_text = "A";
-
-
 
 export const init = async model => {
    model.animate(() => {

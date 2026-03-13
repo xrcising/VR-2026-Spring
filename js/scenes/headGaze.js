@@ -12,14 +12,18 @@ export const init = async model => {
    model.animate(() => {
       let nMin = -1, dMin = 1000;
       let mm = cg.mMultiply(clay.root().viewMatrix(0), worldCoords);
+
+      // nMin := child we are gazing at
       for (let n = 0 ; n < model.nChildren() ; n++) {
          let m = cg.mMultiply(mm, model.child(n).getMatrix());
          let d = m[12]*m[12] + m[13]*m[13];
-	 if (m[14] < 0 && d < dMin) {
-	    dMin = d;
-	    nMin = n;
-	 }
+         if (m[14] < 0 && d < dMin) {
+            dMin = d;
+            nMin = n;
+         }
       }
+
+      // dynamically highlight nMin red and other children white
       for (let n = 0 ; n < model.nChildren() ; n++)
          model.child(n).child(0).color(n == nMin ? [1,0,0] : [1,1,1])
 	                        .identity().scale(n == nMin ? 1 : .7);

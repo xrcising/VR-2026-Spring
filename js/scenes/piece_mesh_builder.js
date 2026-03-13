@@ -1,5 +1,6 @@
 import * as cg from "../render/core/cg.js";
 
+// Mesh data from Homework 6 in Computer Graphics in Fall 2025
 let queenData = [
   // lid handle (n=20)
   0.01, 3, 0.0,                  

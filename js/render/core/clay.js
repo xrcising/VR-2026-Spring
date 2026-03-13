@@ -1110,6 +1110,44 @@ let uvToDisk = (u,v,dz) => {
    return vertexArray([x,y,z], [0,0,dz ? Math.sign(dz) : 1], [x,y,0], [u,v]);
 }
 
+let uvToHalfDisk = (u,v,dz) => {
+   let du = 0;
+   if (dz === undefined) dz = 0;
+   else if (Array.isArray(dz)) { du = dz[1]; dz = dz[0]; }
+   let theta = Math.PI * (u + du);
+   if (dz == -1) theta = -theta;
+   let x = Math.sin(theta) * v;
+   let y = Math.cos(theta) * v;
+   let z = dz;
+
+   return vertexArray([x,y,z], [0,0,dz ? Math.sign(dz) : 1], [x,y,0], [u,v]);
+}
+
+let uvToRoundedSquare = (u, v, dz) => {
+   let du = 0;
+   if (dz === undefined) dz = 0;
+   else if (Array.isArray(dz)) { du = dz[1]; dz = dz[0]; }
+   let theta = 2 * Math.PI * (u + du);
+   if (dz == -1) theta = -theta;
+   
+   // "n" controls the squareness. 
+   // n = 2 is a perfect circle.
+   // n = 4 is a nice rounded square (a squircle).
+   // n = 10+ is a sharp square with slightly rounded corners.
+   let n = 30; 
+   
+   // Calculate the max radius at this specific angle using the superellipse formula
+   let cosT = Math.cos(theta);
+   let sinT = Math.sin(theta);
+   let r = Math.pow(Math.pow(Math.abs(cosT), n) + Math.pow(Math.abs(sinT), n), -1/n);
+   // Multiply by v to scale from the center (0) to the outer edge (r)
+   let x = cosT * r * v;
+   let y = sinT * r * v;
+   let z = dz;
+   // Returns the same format as uvToDisk
+   return vertexArray([x,y,z], [0,0,dz ? Math.sign(dz) : 1], [x,y,0], [u,v]);
+}
+
 this.createGrid = (nu,nv) =>
    createMesh(nu,nv, (u,v) => vertexArray([2*u-1,2*v-1,0], [0,0,1], [1,0,0], [u,v]));
 
@@ -1130,7 +1168,7 @@ let buildCylinderZMesh = n => glueMeshes(glueMeshes(buildTubeZMesh(n),
 let buildCanZMesh = n => glueMeshes(buildTubeZMesh(n),
                                     createMesh(n, 2, uvToDisk, -1));
 
-let torusZMesh    = createMesh(32, 16, uvToTorus, .37);
+let torusZMesh    = createMesh(32, 16, uvToTorus, .1);
 let torusXMesh    = permuteCoords(torusZMesh);
 let torusYMesh    = permuteCoords(torusXMesh);
 let sphereMesh    = createMesh(32, 16, uvToSphere);
@@ -1138,6 +1176,10 @@ let tubeMesh      = buildTubeZMesh(32);
 let diskZMesh     = createMesh(32,  2, uvToDisk);
 let diskXMesh     = permuteCoords(diskZMesh);
 let diskYMesh     = permuteCoords(diskXMesh);
+let halfDiskZMesh = createMesh(32, 2, uvToHalfDisk);
+let halfDiskXMesh = permuteCoords(halfDiskZMesh);
+let halfDiskYMesh = permuteCoords(halfDiskXMesh);
+let roundedSquareMesh = createMesh(300, 2, uvToRoundedSquare);
 let coneZMesh      = glueMeshes(createMesh(32, 2, uvToCone),
                                 createMesh(32, 2, uvToDisk, -1));
 let coneXMesh     = permuteCoords(coneZMesh);
@@ -1592,6 +1634,12 @@ function Blobs() {
    setFormMesh('diskX', diskXMesh);
    setFormMesh('diskY', diskYMesh);
    setFormMesh('diskZ', diskZMesh);
+
+   setFormMesh('halfDiskX', halfDiskXMesh);
+   setFormMesh('halfDiskY', halfDiskYMesh);
+   setFormMesh('halfDiskZ', halfDiskZMesh);
+
+   setFormMesh('roundedSquare', roundedSquareMesh);
 
    let blob = (data, x,y,z) => implicitFunction(data.form,
       data.m,

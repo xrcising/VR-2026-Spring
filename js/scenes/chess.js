@@ -1,8 +1,10 @@
 import * as cg from "../render/core/cg.js";
 import * as pieceMeshBuilder from "./piece_mesh_builder.js";
+import { constructFEN, getNewFEN, getMoveDetails } from "./board_analysis.js";
 import { controllerMatrix } from "../render/core/controllerInput.js";
 import { lcb, rcb } from "../handle_scenes.js";
 import { loadSound, playSoundAtPosition } from "../util/positional-audio.js";
+
 
 // LOAD ALL THE SOUNDS THAT WILL BE MADE WHEN BALLS BOUNCE.
 
@@ -55,6 +57,9 @@ window.pieceInfo = {
   // Captured pieces
   capturedWhiteCount: 0,
   capturedBlackCount: 0,
+  fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+  moveHistory: [],
+  board_history: "Moves:\n"
 };
 
   // convert 3d positions to chessboard squares (e.g. [0,0,0] -> "a1")
@@ -90,7 +95,7 @@ window.pieceInfo = {
 
   let isSquareFree = (square) => {
     for (const piece in pieceInfo) {
-      if (piece === 'capturedWhiteCount' || piece === 'capturedBlackCount') continue;
+      if (piece === 'capturedWhiteCount' || piece === 'capturedBlackCount' || piece === 'fen' || piece === 'moveHistory' || piece === 'board_history') continue;
       if (pieceInfo[piece].square == square) {
         return false;
       }
@@ -285,26 +290,109 @@ export const init = async model => {
 
   inputEvents.onRelease = hand => {
     for (const piece in pieceInfo) {
+      if (piece === 'capturedWhiteCount' || piece === 'capturedBlackCount' || piece === 'fen' || piece === 'moveHistory' || piece === 'board_history') continue;
       if (pieceInfo[piece].isGrabbed) {
         const xyz = pieceInfo[piece].xyz;
         const square = xyzToSquare(xyz);
-        if (square != null && !isSquareFree(square)) {
-          takePieceIfSquareNotFree(square);
-          pieceInfo[piece].xyz = squareToXYZ(square);
-          pieceInfo[piece].square = square;
-          playSoundAtPosition(soundBuffer[0], pieceInfo[piece].xyz);
+        const currentSquare = pieceInfo[piece].square;
+
+        // Ensure we have a valid FEN (fallback to construction if missing/corrupt, though we initialized it)
+        let currentFen = pieceInfo.fen;
+        if (!currentFen) {
+            currentFen = constructFEN(pieceInfo);
+            pieceInfo.fen = currentFen;
         }
-        else {
-          //takePiece(square);
+
+        // Validate move
+        let moveIsLegal = false;
+        let nextFen = currentFen;
+        let moveDetails = null;
+
+        if (square != null && currentSquare != null) {
+            // Check if piece actually moved to a different square
+            if (square !== currentSquare) {
+                moveDetails = getMoveDetails(currentFen, currentSquare, square);
+                if (moveDetails) {
+                    moveIsLegal = true;
+                    nextFen = getNewFEN(currentFen, currentSquare, square);
+                }
+            } else {
+                // Same square, technically legal to drop it back where it was
+                moveIsLegal = true;
+            }
+        }
+
+        if (moveIsLegal) {
+          if (square !== currentSquare) {
+             // Update FEN
+             pieceInfo.fen = nextFen;
+             
+             // Update Move History
+             if (moveDetails && moveDetails.san) {
+                 if (!pieceInfo.moveHistory) pieceInfo.moveHistory = [];
+                 pieceInfo.moveHistory.push(moveDetails.san);
+                 
+                 // Update formatted history string
+                 let historyStr = "Moves:\n";
+                 for (let i = 0; i < pieceInfo.moveHistory.length; i += 2) {
+                     const moveNum = Math.floor(i / 2) + 1;
+                     const whiteMove = pieceInfo.moveHistory[i];
+                     const blackMove = pieceInfo.moveHistory[i + 1] || "";
+                     
+                     historyStr += `${moveNum}.${whiteMove}`;
+                     if (blackMove) {
+                         historyStr += `  ${blackMove}`;
+                     }
+                     historyStr += "\n";
+                 }
+                 pieceInfo.board_history = historyStr;
+             }
+             
+             // Handle capture
+             // Check if it's a capture based on move details (includes standard capture and en passant)
+             let isCapture = moveDetails && (moveDetails.flags.includes('c') || moveDetails.flags.includes('e'));
+             
+             if (isCapture) {
+                if (moveDetails.flags.includes('e')) {
+                    // It's en passant. The captured piece is at the square:
+                    // 'to' column, 'from' row.
+                    const capturedSquareCol = square.charAt(0);
+                    const capturedSquareRow = currentSquare.charAt(1);
+                    const capturedSquare = capturedSquareCol + capturedSquareRow;
+                    takePieceIfSquareNotFree(capturedSquare);
+                } else {
+                    // Standard capture
+                    takePieceIfSquareNotFree(square);
+                }
+                
+                playSoundAtPosition(soundBuffer[0], pieceInfo[piece].xyz);
+             } else {
+                 // Play move sound
+                 if (piece.charAt(0) === 'w') {
+                   playSoundAtPosition(soundBuffer[2], pieceInfo[piece].xyz);
+                 } else {
+                   playSoundAtPosition(soundBuffer[1], pieceInfo[piece].xyz);
+                 }
+             }
+          }
+          
           pieceInfo[piece].xyz = squareToXYZ(square);
           pieceInfo[piece].square = square;
-          // if piece is white, play move-self sound, otherwise play move-opponent sound
-          if (piece.charAt(0) === 'w') {
-            playSoundAtPosition(soundBuffer[2], pieceInfo[piece].xyz);
-          } else {
-            playSoundAtPosition(soundBuffer[1], pieceInfo[piece].xyz);
+        } 
+        else {
+          // Illegal move or off board -> revert back to square piece was on
+          if (currentSquare && currentSquare !== 'captured') {
+              pieceInfo[piece].xyz = squareToXYZ(currentSquare);
+              // pieceInfo[piece].square remains currentSquare
+          } 
+          // Any other edge case revert back
+          else {
+            if (currentSquare) {
+                pieceInfo[piece].xyz = squareToXYZ(currentSquare);
+            }
           }
         }
+
         selectedPiece = null;
         pieceInfo[piece].isGrabbed = false;
         pieceInfo[piece].rgb = piece.charAt(0) == 'w' ? [1,1,1] : [.02,.02,.02];
@@ -401,9 +489,22 @@ export const init = async model => {
   let bletters = model.add(blettersMesh);
   let bnumbers = model.add(bnumbersMesh);
 
+  let boardHistory = null;
+  let lastBoardHistory = "";
+
   // Render board and pieces
   model.move(0,1,0).scale(.2).animate(() => {
     pieceInfo = server.synchronize('pieceInfo');
+    
+    if (pieceInfo.board_history !== lastBoardHistory) {
+        lastBoardHistory = pieceInfo.board_history;
+        if (boardHistory) model.remove(boardHistory);
+        if (lastBoardHistory) {
+            let meshName = clay.text(lastBoardHistory, .5);
+            boardHistory = model.add(meshName);
+            boardHistory.identity().move(1.8, 0, -0.5).turnX(-Math.PI/2).scale(3);
+        }
+    }
 
     
     wletters/*model.add(lettersMesh)*/.identity()

@@ -43,6 +43,8 @@ export default () => {
          { name: "custom_bouncing" , path: "./custom_bouncing.js" , public: true },
          { name: "chess"           , path: "./chess.js"           , public: true }, // This scene is for HW 3, 4, and 5
          { name: "clock"           , path: "./clock.js"           , public: true }, // This scene is for HW 5 as well
+         { name: "xrcising_prototype-1" , path: "./xrcising_prototype-1.js" , public: true }, // This scene is for HW 6
+         { name: "xrcising_prototype-2" , path: "./xrcising_prototype-2.js" , public: true },
          
          
       ]

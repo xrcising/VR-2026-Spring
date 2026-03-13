@@ -25,7 +25,7 @@ export const init = async model => {
          let text = 'u:' + round(u) + '\nv:' + round(v) + '\nd:' + round(d);
          model.add(clay.text(text)).move(-.036,y+.03,.001)
 	                           .scale(.02/inch).color(0,0,0);
-	 vibrate('left', u*u < .033 && v*v < .09 ? 1 : .4);
+	      vibrate('left', .4);//u*u < .033 && v*v < .09 ? 1 : .4);
       }
 
       // RIGHT CONTROLLER BEAM MOVES A TARGET OBJECT AND MAKES A PULSED VIBRATION
