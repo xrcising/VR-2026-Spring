@@ -345,6 +345,12 @@ export function pauseAudio() {
     // }
 }
 
+export function resumeAudio() {
+    if (audioContext.state == 'running')
+        return;
+    audioContext.resume();
+}
+
 window.addEventListener('blur', () => {
     // As a general rule you should mute any sounds your page is playing
     // whenever the page loses focus.

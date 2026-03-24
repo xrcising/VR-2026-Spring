@@ -11,8 +11,8 @@ Promise.all(loadSounds);
 
 // CREATE AN INITIAL POSITION FOR EVERY BALL.
 
-let N = 50, p = [], hit = [], r = .05, R = Math.random, v = [];
-let lo = [-2.8,r,-2.8], hi = [2.8,3-r,2.8];
+let N = 50, p = [], hit = [], r = .2, R = Math.random, v = [];
+let lo = [0,r,-2.8], hi = [2.8,3-r,2.8];
 for (let i = 0 ; i < N ; i++) {
    p.push([ lo[0] + (hi[0] - lo[0]) * R(),
             lo[1] + (hi[1] - lo[1]) * R(),
@@ -129,7 +129,7 @@ export const init = async model => {
             if (p[i][j] > hi[j]) v[i][j] = -Math.abs(v[i][j]);
          }
       for (let i = 0 ; i < N ; i++) {       // MOVE EACH BALL BY ITS VELOCITY
-         v[i][1] -= .02 * model.deltaTime;
+         v[i][1] -= .2 * model.deltaTime;
          v[i] = cg.scale(v[i], .992);
          p[i] = cg.add(p[i], v[i]);
       }
