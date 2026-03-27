@@ -296,6 +296,7 @@ export const init = async model => {
                            
                            // Start the new song from the beginning
                            playSong(i);
+                           playCustomSound('songSelectSound');
                            for (let t of tracks) fadeIn(t.track);
                            fadeOut(songSelect);
                            currentMenu = 'playingSong';
