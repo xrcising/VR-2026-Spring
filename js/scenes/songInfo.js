@@ -7,6 +7,8 @@ export let songs = [
   "[Song 6]",
   "[Song 7]"];
 
+export let startAt = 0; // start song at X seconds (DEBUGGING PURPOSES)
+
 export let songInfo = {
   rocky_road_to_dublin: {
      name: "Rocky Road to Dublin - Sinners (2025)",
@@ -315,7 +317,7 @@ export let songInfo = {
      name: "The Grid",
      bpm: 117, // beat # = 1.95 beats/s x timestamp (in seconds)
      map: [
-        // (00:00:000 - 0:08:000) intro, no obstacles
+        // (00:00.000 - 0:08.000) intro, no obstacles
         { beat: 16.575, track: 0, gridPos: 8, color: 'blue', dir: 'left', speed: 7},
         { beat: 16.575, track: 0, gridPos: 11, color: 'red', dir: 'right', speed: 7},
 
@@ -323,9 +325,9 @@ export let songInfo = {
         { beat: 35.1, track: 1, gridPos: 7,  color: 'red', dir: 'right', speed: 7},
 
         
-        // 00:51:500) the grid speech and buildup
+        // 00:51.500) the grid speech and buildup
 
-        // (00:51:500 - XX:XX:XXX) first beat drop
+        // (00:51.500 - XX:XX.XXX) first beat drop
         { beat: 100.425, track: 0, gridPos: 13, color: 'blue', dir: 'down', speed: 7},
         { beat: 100.425, track: 0, gridPos: 14, color: 'red', dir: 'down', speed: 7},
 
@@ -364,6 +366,152 @@ export let songInfo = {
 
         { beat: 112.425, track: 0, gridPos: 13, color: 'blue', dir: 'down', speed: 7},
         { beat: 112.425, track: 0, gridPos: 14, color: 'red', dir: 'down', speed: 7},
+
+        { beat: 113.425, track: 0, gridPos: 1, color: 'blue', dir: 'up', speed: 7},
+        { beat: 113.425, track: 0, gridPos: 2, color: 'red', dir: 'up', speed: 7},
+
+        // switch direction of red
+        { beat: 114.425, track: 0, gridPos: 13, color: 'blue', dir: 'down', speed: 7},
+        //{ beat: 115.425, track: 0, gridPos: 14, color: 'red', dir: 'down', speed: 7},
+
+        { beat: 115.425, track: 0, gridPos: 13, color: 'blue', dir: 'up', speed: 7},
+        { beat: 115.425, track: 0, gridPos: 15, color: 'red', dir: 'down', speed: 7},
+
+        { beat: 116.425, track: 0, gridPos: 12, color: 'blue', dir: 'down', speed: 7},
+        { beat: 116.425, track: 0, gridPos: 14, color: 'red', dir: 'up', speed: 7},
+
+        { beat: 117.425, track: 0, gridPos: 13, color: 'blue', dir: 'up', speed: 7},
+        { beat: 117.425, track: 0, gridPos: 15, color: 'red', dir: 'down', speed: 7},
+
+        { beat: 118.425, track: 0, gridPos: 12, color: 'blue', dir: 'down', speed: 7},
+        { beat: 118.425, track: 0, gridPos: 14, color: 'red', dir: 'up', speed: 7},
+
+        { beat: 119.425, track: 0, gridPos: 13, color: 'blue', dir: 'up', speed: 7},
+        { beat: 119.425, track: 0, gridPos: 15, color: 'red', dir: 'down', speed: 7},
+
+        { beat: 120.425, track: 0, gridPos: 12, color: 'blue', dir: 'down', speed: 7},
+        { beat: 120.425, track: 0, gridPos: 14, color: 'red', dir: 'up', speed: 7},
+        
+        { beat: 121.425, track: 0, gridPos: 13, color: 'blue', dir: 'up', speed: 7},
+        { beat: 121.425, track: 0, gridPos: 15, color: 'red', dir: 'down', speed: 7},
+
+        { beat: 122.425, track: 0, gridPos: 12, color: 'blue', dir: 'down', speed: 7},
+        { beat: 122.425, track: 0, gridPos: 14, color: 'red', dir: 'up', speed: 7},
+        
+        { beat: 123.425, track: 0, gridPos: 13, color: 'blue', dir: 'up', speed: 7},
+        { beat: 123.425, track: 0, gridPos: 15, color: 'red', dir: 'down', speed: 7},
+
+        { beat: 124.425, track: 0, gridPos: 12, color: 'blue', dir: 'down', speed: 7},
+        { beat: 124.425, track: 0, gridPos: 14, color: 'red', dir: 'up', speed: 7},
+
+        // (01:11.500 - 1:28.000) 360 section
+        // turn right
+        { beat: 140.425, track: 0, gridPos: 13, color: 'blue', dir: 'down_right', speed: 7},
+        { beat: 140.925, track: 0, gridPos: 15, color: 'red', dir: 'down_right', speed: 7},
+
+        { beat: 141.425, track: 0, gridPos: 12, color: 'blue', dir: 'up_left', speed: 7},
+        { beat: 141.925, track: 0, gridPos: 14, color: 'red', dir: 'up_left', speed: 7},
+
+        { beat: 142.425, track: 1, gridPos: 12, color: 'blue', dir: 'down_right', speed: 7},
+        { beat: 142.925, track: 1, gridPos: 14, color: 'red', dir: 'down_right', speed: 7},
+
+        { beat: 143.425, track: 1, gridPos: 12, color: 'blue', dir: 'up_left', speed: 7},
+        { beat: 143.925, track: 1, gridPos: 14, color: 'red', dir: 'up_left', speed: 7},
+
+        { beat: 144.425, track: 2, gridPos: 12, color: 'blue', dir: 'down_right', speed: 7},
+        { beat: 144.925, track: 2, gridPos: 14, color: 'red', dir: 'down_right', speed: 7},
+
+        { beat: 145.425, track: 2, gridPos: 12, color: 'blue', dir: 'up_left', speed: 7},
+        { beat: 145.925, track: 2, gridPos: 14, color: 'red', dir: 'up_left', speed: 7},
+
+        { beat: 146.425, track: 3, gridPos: 12, color: 'blue', dir: 'down_right', speed: 7},
+        { beat: 146.925, track: 3, gridPos: 14, color: 'red', dir: 'down_right', speed: 7},
+
+        { beat: 147.425, track: 3, gridPos: 12, color: 'blue', dir: 'up_left', speed: 7},
+        { beat: 147.925, track: 3, gridPos: 14, color: 'red', dir: 'up_left', speed: 7},
+
+        { beat: 148.425, track: 4, gridPos: 12, color: 'blue', dir: 'down_right', speed: 7},
+        { beat: 148.925, track: 4, gridPos: 14, color: 'red', dir: 'down_right', speed: 7},
+
+        { beat: 149.425, track: 4, gridPos: 12, color: 'blue', dir: 'up_left', speed: 7},
+        { beat: 149.925, track: 4, gridPos: 14, color: 'red', dir: 'up_left', speed: 7},
+
+        { beat: 150.425, track: 5, gridPos: 12, color: 'blue', dir: 'down_right', speed: 7},
+        { beat: 150.925, track: 5, gridPos: 14, color: 'red', dir: 'down_right', speed: 7},
+
+        { beat: 151.425, track: 5, gridPos: 12, color: 'blue', dir: 'up_left', speed: 7},
+        { beat: 151.925, track: 5, gridPos: 14, color: 'red', dir: 'up_left', speed: 7},
+
+        { beat: 152.425, track: 6, gridPos: 12, color: 'blue', dir: 'down_right', speed: 7},
+        { beat: 152.925, track: 6, gridPos: 14, color: 'red', dir: 'down_right', speed: 7},
+
+        { beat: 153.425, track: 6, gridPos: 12, color: 'blue', dir: 'up_left', speed: 7},
+        { beat: 153.925, track: 6, gridPos: 14, color: 'red', dir: 'up_left', speed: 7},
+
+        { beat: 154.425, track: 7, gridPos: 12, color: 'blue', dir: 'down_right', speed: 7},
+        { beat: 154.925, track: 7, gridPos: 14, color: 'red', dir: 'down_right', speed: 7},
+
+        { beat: 155.425, track: 7, gridPos: 12, color: 'blue', dir: 'up_left', speed: 7},
+        { beat: 155.925, track: 7, gridPos: 14, color: 'red', dir: 'up_left', speed: 7},
+
+        // turn left
+        { beat: 156.425, track: 7, gridPos: 13, color: 'blue', dir: 'down_left', speed: 7},
+        { beat: 156.925, track: 7, gridPos: 15, color: 'red', dir: 'down_left', speed: 7},
+
+        { beat: 157.425, track: 7, gridPos: 13, color: 'blue', dir: 'up_right', speed: 7},
+        { beat: 157.925, track: 7, gridPos: 15, color: 'red', dir: 'up_right', speed: 7},
+
+        { beat: 158.425, track: 6, gridPos: 13, color: 'blue', dir: 'down_left', speed: 7},
+        { beat: 158.925, track: 6, gridPos: 15, color: 'red', dir: 'down_left', speed: 7},
+
+        { beat: 159.425, track: 6, gridPos: 13, color: 'blue', dir: 'up_right', speed: 7},
+        { beat: 159.925, track: 6, gridPos: 15, color: 'red', dir: 'up_right', speed: 7},
+
+        { beat: 160.425, track: 5, gridPos: 13, color: 'blue', dir: 'down_left', speed: 7},
+        { beat: 160.925, track: 5, gridPos: 15, color: 'red', dir: 'down_left', speed: 7},
+
+        { beat: 161.425, track: 5, gridPos: 13, color: 'blue', dir: 'up_right', speed: 7},
+        { beat: 161.925, track: 5, gridPos: 15, color: 'red', dir: 'up_right', speed: 7},
+
+        { beat: 162.425, track: 4, gridPos: 13, color: 'blue', dir: 'down_left', speed: 7},
+        { beat: 162.925, track: 4, gridPos: 15, color: 'red', dir: 'down_left', speed: 7},
+
+        { beat: 163.425, track: 4, gridPos: 13, color: 'blue', dir: 'up_right', speed: 7},
+        { beat: 163.925, track: 4, gridPos: 15, color: 'red', dir: 'up_right', speed: 7},
+
+        { beat: 164.425, track: 3, gridPos: 13, color: 'blue', dir: 'down_left', speed: 7},
+        { beat: 164.925, track: 3, gridPos: 15, color: 'red', dir: 'down_left', speed: 7},
+
+        { beat: 165.425, track: 3, gridPos: 13, color: 'blue', dir: 'up_right', speed: 7},
+        { beat: 165.925, track: 3, gridPos: 15, color: 'red', dir: 'up_right', speed: 7},
+
+        { beat: 166.425, track: 2, gridPos: 13, color: 'blue', dir: 'down_left', speed: 7},
+        { beat: 166.925, track: 2, gridPos: 15, color: 'red', dir: 'down_left', speed: 7},
+
+        { beat: 167.425, track: 2, gridPos: 13, color: 'blue', dir: 'up_right', speed: 7},
+        { beat: 167.925, track: 2, gridPos: 15, color: 'red', dir: 'up_right', speed: 7},
+
+        { beat: 168.425, track: 1, gridPos: 13, color: 'blue', dir: 'down_left', speed: 7},
+        { beat: 168.925, track: 1, gridPos: 15, color: 'red', dir: 'down_left', speed: 7},
+
+        { beat: 169.425, track: 1, gridPos: 13, color: 'blue', dir: 'up_right', speed: 7},
+        { beat: 169.925, track: 1, gridPos: 15, color: 'red', dir: 'up_right', speed: 7},
+
+        { beat: 170.425, track: 0, gridPos: 13, color: 'blue', dir: 'down_left', speed: 7},
+        { beat: 170.925, track: 0, gridPos: 15, color: 'red', dir: 'down_left', speed: 7},
+
+        { beat: 171.425, track: 0, gridPos: 13, color: 'blue', dir: 'up_right', speed: 7},
+        { beat: 171.925, track: 0, gridPos: 15, color: 'red', dir: 'up_right', speed: 7},
+
+        { beat: 172.425, track: 0, gridPos: 0, color: 'blue', dir: 'up', speed: 7},
+        { beat: 172.925, track: 0, gridPos: 3, color: 'red', dir: 'up', speed: 7},
+
+        { beat: 173.425, track: 0, gridPos: 12, color: 'blue', dir: 'down', speed: 7},
+        { beat: 173.425, track: 0, gridPos: 15, color: 'red', dir: 'down', speed: 7},
+
+        
+        
+        
         
 
      ],

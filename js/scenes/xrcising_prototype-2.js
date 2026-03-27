@@ -10,7 +10,7 @@ import {
    stopLoopingSound02
 } from "../util/positional-audio.js";
 import { controllerMatrix, joyStickState, ControllerBeam, buttonState } from "../render/core/controllerInput.js";
-import { songInfo, songs } from "./songInfo.js";
+import { songInfo, songs, startAt } from "./songInfo.js";
 
 let lFanAngle = 0;
 let rFanAngle = 0;
@@ -64,24 +64,39 @@ let truncateString = (str, maxLength) => {
 
 let soundBuffer = [], loadSounds = [];
 let songBuffer = [], loadSongs = [];
-for (let i = 0 ; i < 6 ; i++)
-   loadSounds.push(loadSound('../../media/sound/bounce/'+i+'.wav', buffer => soundBuffer[i] = buffer));
+//for (let i = 0 ; i < 6 ; i++)
+   //loadSounds.push(loadSound('../../media/sound/bounce/'+i+'.wav', buffer => soundBuffer[i] = buffer));
+loadSounds.push(loadSound('../../media/sound/xrcisingSounds/1_TYPE_05.WAV', buffer => soundBuffer[0] = buffer)); // hit sound
+loadSounds.push(loadSound('../../media/sound/xrcisingSounds/1_BLIP_01.WAV', buffer => soundBuffer[1] = buffer)); // song scroll sound
+loadSounds.push(loadSound('../../media/sound/xrcisingSounds/1_BLIP_04.WAV', buffer => soundBuffer[2] = buffer)); // start menu button sound
+loadSounds.push(loadSound('../../media/sound/xrcisingSounds/1_LIGHT_03.WAV', buffer => soundBuffer[3] = buffer)); // hit miss sound
+loadSounds.push(loadSound('../../media/sound/xrcisingSounds/DISC_SPAWN.WAV', buffer => soundBuffer[4] = buffer)); // song select sound
 
 loadSongs.push(loadSound('../../media/sound/xrcisingSongs/Rocky Road to Dublin - Sinners (Original Motion Picture Soundtrack).mp3', buffer => songBuffer[0] = buffer));
 loadSongs.push(loadSound('../../media/sound/xrcisingSongs/Rasputin - Love The Way You Move (Funk Overload).mp3', buffer => songBuffer[1] = buffer));
 loadSongs.push(loadSound('../../media/sound/xrcisingSongs/thegrid.wav', buffer => songBuffer[2] = buffer));
+loadSongs.push(loadSound('../../media/sound/xrcisingSongs/LOOP3.WAV', buffer => songBuffer[3] = buffer)); // main menu music
 
 Promise.all(loadSounds);
 Promise.all(loadSongs);
 
-
+let soundMap = {
+   'hitSound': 0,
+   'scrollSound': 1,
+   'startButtonSound': 2,
+   'missSound': 3,
+   'songSelectSound': 4
+}
 
 let unlit = [[1,.0,.0],[.8,.0,.4],[.8,.8,.0],[0.,.4,.8]];
 let   lit = [[1,.5,.5],[1,.5,.75],[1.,1.,.5],[.6,.8,1.]];
 
 export const init = async model => {
-   let playSong = i => playLoopingSoundAtPosition02(songBuffer[i], [0,0,0]);
+   let playSong = i => playLoopingSoundAtPosition02(songBuffer[i], [0,0,0], startAt);
    let stopSong = () => stopLoopingSound02();
+   let playCustomSound = (sound, pos = [0,0,0]) => {
+      playSoundAtPosition(soundBuffer[soundMap[sound]], pos);
+   }
 
    // fans
    let lfan_front = model.add('halfDiskX').color('blue');
@@ -121,7 +136,11 @@ export const init = async model => {
       
       let secPerBeat = 60 / bpm;
       let arrivalTime = beat * secPerBeat;
-      let zStart = -(speed * arrivalTime);
+      /*DEBUGGER CODE*/
+      let timeRemaining = arrivalTime - startAt;
+      if (timeRemaining < 0) return;
+      /*END DEBUGGER CODE*/
+      let zStart = -(speed * timeRemaining);
 
       let [x, y] = getGridPos(gridPos);
       let ballObj = tracks[trackIndex].ballGroup.add('sphere').opacity(0);
@@ -163,10 +182,10 @@ export const init = async model => {
 
    let playSound = (b) => {
       let globalPos = cg.mTransform(tracks[b.trackIndex].ballGroup.getGlobalMatrix(), b.p);
-      playSoundAtPosition(soundBuffer[6*Math.random()>>0], globalPos);
+      playCustomSound('hitSound', globalPos);
    };
 
-   let selectedSong = -1;
+   let selectedSong = 3;
    let isSongPlaying = false;
    let lastSongChangeTime = 0; // timestamp of last song play/pause
 
@@ -220,6 +239,9 @@ export const init = async model => {
    let lBeam = new ControllerBeam(model, 'left');
    let rBeam = new ControllerBeam(model, 'right');
 
+   // start playing main menu music on load
+   playSong(3);
+
    inputEvents.onPress = hand => {
       // Only use the left hand trigger since we only have a left beam right now
       if (hand === 'left' || hand === 'right') {
@@ -231,6 +253,7 @@ export const init = async model => {
                let lhit = lBeam.hitRect(startButton.getGlobalMatrix());
                let rhit = rBeam.hitRect(startButton.getGlobalMatrix());
                if (lhit && !isNaN(lhit[0]) || rhit && !isNaN(rhit[0])) {
+                  playCustomSound('startButtonSound');
                   fadeOut(startMenu);
                   fadeIn(songSelect);
                   currentMenu = 'songSelect';
@@ -278,7 +301,9 @@ export const init = async model => {
                            currentMenu = 'playingSong';
                            isSongPlaying = true;
                            selectedSong = i;
-                           lastSongChangeTime = currentTime;
+                           /*DEBUGGER CODE*/
+                           lastSongChangeTime = currentTime - (startAt * 1000);
+                           /*END DEBUGGER CODE*/
                            totalPausedTime = 0;
                            isPaused = false;
 
@@ -330,6 +355,8 @@ export const init = async model => {
                   selectedSong = -1;
                   isSongPlaying = false;
                   stopSong();
+                  playSong(3);
+                  selectedSong = 3;
                   fadeOut(pauseMenu);
                   fadeIn(songSelect);
                   for (let t of tracks) fadeOut(t.track);
@@ -383,7 +410,7 @@ export const init = async model => {
          lHitbox.identity()
                 .setMatrix(controllerMatrix.left)
                 .move(0, 0, -0.5) // Shift it forward so it starts at the controller base
-                .scale(0.02, 0.02, 0.5) // Thin it out, and scale length to 1 unit
+                .scale(0.04, 0.04, 0.5) // Thin it out, and scale length to 1 unit
                 .opacity(isSongPlaying ? .5 : 0);
       }
       
@@ -391,7 +418,7 @@ export const init = async model => {
          rHitbox.identity()
                 .setMatrix(controllerMatrix.right)
                 .move(0, 0, -0.5)
-                .scale(0.02, 0.02, 0.5)
+                .scale(0.04, 0.04, 0.5)
                 .opacity(isSongPlaying ? .5 : 0);
       }
 
@@ -422,93 +449,8 @@ export const init = async model => {
       }
       wasAPressed = isAPressed;
 
-      let trackInverses = tracks.map(t => cg.mInverse(t.ballGroup.getGlobalMatrix()));
-      for (let hand in {left:0, right:0}) {
-         let cMatrix = controllerMatrix[hand];
-         if (!cMatrix) continue;
-  
-         // 1. Calculate the 1-meter blade
-         let basePos = [cMatrix[12], cMatrix[13], cMatrix[14]];
-         let forward = [-cMatrix[8], -cMatrix[9], -cMatrix[10]];
-         let tipPos = vAdd(basePos, vScale(forward, 1.0));
-  
-         // Track the TIP's previous position instead of the base to capture wrist flicks
-         let prevTipPos = previousHands[hand + '_tip'] || tipPos;
-         let swingVelocity = vSub(tipPos, prevTipPos);
-         let swingSpeed = cg.distance(tipPos, prevTipPos);
-         
-         // Transform global blade points into the local space of the tracks
-         let localBases = trackInverses.map(inv => cg.mTransform(inv, basePos));
-         let localTips  = trackInverses.map(inv => cg.mTransform(inv, tipPos));
-         
-         for (let i = activeBalls.length - 1; i >= 0; i--) {
-            let b = activeBalls[i];
-            let trackIdx = b.trackIndex;
-            
-            // 2. Point-to-Line collision check
-            let dist = distToSegment(b.p, localBases[trackIdx], localTips[trackIdx]);
-  
-            // Anti-Tunneling: Expand the hit radius slightly based on how fast they swing
-            let hitRadius = b.r + (swingSpeed * 0.8); 
-  
-            if (dist < hitRadius) {
-               let hitValid = true;
-  
-               // 3. Direction Check 
-               if (b.direction !== 'no_direction') {
-                  // Figure out the local vector we are supposed to hit toward
-                  let angle = rotations[b.direction];
-                  let expectedDir = [Math.cos(angle), Math.sin(angle), 0];
-  
-                  // Convert our actual swing velocity into this track's local space
-                  let globalSwingEnd = vAdd(basePos, swingVelocity);
-                  let localSwingEnd = cg.mTransform(trackInverses[trackIdx], globalSwingEnd);
-                  let localSwingDir = vSub(localSwingEnd, localBases[trackIdx]);
-                  
-                  let mag = Math.sqrt(vDot(localSwingDir, localSwingDir));
-                  if (mag > 0.001) { // Prevents dividing by zero
-                     localSwingDir = vScale(localSwingDir, 1/mag);
-                     let alignment = vDot(localSwingDir, expectedDir);
-                     
-                     // alignment > 0 means the swing generally matches the target direction. 
-                     // Require > 0.3 to ensure they actually slice with some accuracy.
-                     if (alignment < 0.3) {
-                        hitValid = false;
-                     }
-                  } else {
-                     // If they are just holding the controller still inside the ball
-                     hitValid = false; 
-                  }
-               }
-  
-               if (hitValid) {
-                  playSound(b);
-                  vibrate(hand, .4);
-                  b.obj.opacity(0);
-                  b.obj.parent().remove(b.obj);
-                  activeBalls.splice(i, 1);
-                  currentCombo++;
-                  currentScore += 100 * currentCombo;
-               }
-            }
-         }
-         // Save current position for the next frame
-         previousHands[hand + '_tip'] = tipPos;
-      }
-      let head = clientState.head(clientID);  // BOUNCE OFF HEAD
-      if (Array.isArray(head)) {
-         pos = head.slice(12,15);
-         let localHead = trackInverses.map(inv => cg.mTransform(inv, pos));
-         for (let i = activeBalls.length - 1; i >= 0; i--) {
-            let b = activeBalls[i];
-	         if (cg.distance(b.p, localHead[b.trackIndex]) < b.r+.15) {
-               playSound(b);
-               b.obj.opacity(0);
-               b.obj.parent().remove(b.obj);
-               activeBalls.splice(i, 1);
-            }
-         }
-      }
+      // While playing a song, track hits
+      renderHitTracking(tracks, activeBalls);
 
       for (let i = activeBalls.length - 1 ; i >= 0 ; i--) {       // MOVE EACH BALL BY ITS VELOCITY
          let b = activeBalls[i];
@@ -531,6 +473,7 @@ export const init = async model => {
                activeBalls.splice(i, 1);
                // keeping track of score
                missedObjects++;
+               if (currentCombo > 5) playCustomSound('missSound'); // miss
                currentCombo = 0;
                continue;
             }
@@ -836,6 +779,100 @@ export const init = async model => {
          .move(0.9, 0.8, -0.005) // top right
          .turnY(pi)
          .scale(tSx, tSx, tSx);
+   }
+
+   let renderHitTracking = (tracks, activeBalls) => {
+      let trackInverses = tracks.map(t => cg.mInverse(t.ballGroup.getGlobalMatrix()));
+      for (let hand in {left:0, right:0}) {
+         let cMatrix = controllerMatrix[hand];
+         if (!cMatrix) continue;
+  
+         // 1. Calculate the 1-meter blade
+         let basePos = [cMatrix[12], cMatrix[13], cMatrix[14]];
+         let forward = [-cMatrix[8], -cMatrix[9], -cMatrix[10]];
+         let tipPos = vAdd(basePos, vScale(forward, 1.0));
+  
+         // Track the TIP's previous position instead of the base to capture wrist flicks
+         let prevTipPos = previousHands[hand + '_tip'] || tipPos;
+         let swingVelocity = vSub(tipPos, prevTipPos);
+         let swingSpeed = cg.distance(tipPos, prevTipPos);
+         
+         // Transform global blade points into the local space of the tracks
+         let localBases = trackInverses.map(inv => cg.mTransform(inv, basePos));
+         let localTips  = trackInverses.map(inv => cg.mTransform(inv, tipPos));
+         
+         for (let i = activeBalls.length - 1; i >= 0; i--) {
+            let b = activeBalls[i];
+            let trackIdx = b.trackIndex;
+            
+            // 2. Point-to-Line collision check
+            let dist = distToSegment(b.p, localBases[trackIdx], localTips[trackIdx]);
+  
+            // Anti-Tunneling: Expand the hit radius slightly based on how fast they swing
+            let controllerRadius = 0.15;
+            let hitRadius = b.r + controllerRadius + (swingSpeed * 0.8); 
+  
+            if (dist < hitRadius) {
+               let hitValid = true;
+  
+               // 3. Direction Check 
+               if (b.direction !== 'no_direction') {
+                  // Figure out the local vector we are supposed to hit toward
+                  let angle = rotations[b.direction];
+                  let expectedDir = [Math.cos(angle), Math.sin(angle), 0];
+  
+                  // Convert our actual swing velocity into this track's local space
+                  let globalSwingEnd = vAdd(basePos, swingVelocity);
+                  let localSwingEnd = cg.mTransform(trackInverses[trackIdx], globalSwingEnd);
+                  let localSwingDir = vSub(localSwingEnd, localBases[trackIdx]);
+                  
+                  let mag = Math.sqrt(vDot(localSwingDir, localSwingDir));
+                  if (mag > 0.001) { // Prevents dividing by zero
+                     localSwingDir = vScale(localSwingDir, 1/mag);
+                     let alignment = vDot(localSwingDir, expectedDir);
+                     
+                     // alignment > 0 means the swing generally matches the target direction. 
+                     // Require > 0.3 to ensure they actually slice with some accuracy.
+                     if (alignment < 0.3) {
+                        hitValid = false;
+                     }
+                  } else {
+                     // If they are just holding the controller still inside the ball
+                     hitValid = false; 
+                  }
+               }
+  
+               if (hitValid) {
+                  playSound(b);
+                  vibrate(hand, .4);
+                  b.obj.opacity(0);
+                  b.obj.parent().remove(b.obj);
+                  activeBalls.splice(i, 1);
+                  currentCombo++;
+                  currentScore += 100 * currentCombo;
+               }
+            }
+         }
+         // Save current position for the next frame
+         previousHands[hand + '_tip'] = tipPos;
+      }
+      // We are going to use the code below for some other exercise
+      // Making the user move their head around to hit things might
+      // encourage more dynamic movement
+      let head = clientState.head(clientID);  // BOUNCE OFF HEAD
+      if (Array.isArray(head)) {
+         let pos = head.slice(12,15);
+         let localHead = trackInverses.map(inv => cg.mTransform(inv, pos));
+         for (let i = activeBalls.length - 1; i >= 0; i--) {
+            let b = activeBalls[i];
+	         if (cg.distance(b.p, localHead[b.trackIndex]) < b.r+.15) {
+               playSound(b);
+               b.obj.opacity(0);
+               b.obj.parent().remove(b.obj);
+               activeBalls.splice(i, 1);
+            }
+         }
+      }
    }
 
    let fadeOut = (object) => {

@@ -81,7 +81,7 @@ export function playLoopingSoundAtPosition(buffer, position) {
     }
 }
 
-export function playLoopingSoundAtPosition02(buffer, position) {
+export function playLoopingSoundAtPosition02(buffer, position, offset = 0) {
     if (audioContext && !ongoingSource02) {
         audioContext.resume();
         ongoingSource02 = audioContext.createBufferSource();
@@ -89,7 +89,7 @@ export function playLoopingSoundAtPosition02(buffer, position) {
         ongoingSource02.loop = true;
         resonanceSource02.setPosition(position[0], position[1], position[2]);
         ongoingSource02.connect(resonanceSource02.input);
-        ongoingSource02.start(0);
+        ongoingSource02.start(0, offset);
         console.log('Looping Sound 02 Played');
     }
 }
