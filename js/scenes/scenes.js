@@ -34,10 +34,12 @@ export default () => {
          { name: "reading"      , path: "./reading.js"      , public: true },
          { name: "parse2"       , path: "./parse2.js"       , public: true },
 
-         { name: "aiHelper"     , path: "./aiQuery.js"    , public: true },
+         { name: "aiHelper"     , path: "./aiQuery.js"      , public: true },
          { name: "parse3"       , path: "./parse3.js"       , public: true },
          { name: "arrange"      , path: "./arrange.js"      , public: true },
          { name: "arrange2"     , path: "./arrange2.js"     , public: true },
+         { name: "widgets"      , path: "./widgets.js"      , public: true },
+         { name: "transfer"     , path: "./transfer.js"     , public: true },
 
          // My scenes
          { name: "text_world"      , path: "./text_world.js"      , public: true },
@@ -51,8 +53,6 @@ export default () => {
          { name: "xrcising_prototype-1" , path: "./xrcising_prototype-1.js" , public: true }, // This scene is for HW 6
          { name: "xrcising_prototype-2" , path: "./xrcising_prototype-2.js" , public: true },
          
-         
-        
       ]
    };
 }
