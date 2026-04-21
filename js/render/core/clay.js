@@ -474,6 +474,8 @@ this.addEventListenersToCanvas = function(canvas) {
    });
 
    window.addEventListener('keydown', function(e) {
+      const tag = e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) { return; }
       switch (e.keyCode) {
       case   8: // DELETE
       case  32: // SPACE

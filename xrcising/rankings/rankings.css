@@ -1,0 +1,71 @@
+.rankings-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rankings-table th {
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0 1rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.rankings-table td {
+  padding: 0.9rem 1rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.rankings-table tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.rank-num {
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.35);
+  width: 48px;
+}
+
+.rank-num--gold { color: #ffd700; }
+.rank-num--silver { color: #c0c0c0; }
+.rank-num--bronze { color: #cd7f32; }
+
+.player-name {
+  font-weight: 600;
+  color: #fff;
+}
+
+.score {
+  font-weight: 700;
+  color: #ff6b9d;
+  font-variant-numeric: tabular-nums;
+}
+
+.tab-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.tab-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tab-btn.active,
+.tab-btn:hover {
+  background: rgba(255, 107, 157, 0.12);
+  border-color: rgba(255, 107, 157, 0.3);
+  color: #ff6b9d;
+}

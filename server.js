@@ -4,6 +4,16 @@ const https = require("https");
 const WebSocket = require("ws");
 const DataStore = require("./DataStore.js");
 const util = require("util");
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const User = require("./models/User.js");
+
+mongoose.connect("mongodb://127.0.0.1:2027/XRcisingDB?directConnection=true", {
+    serverSelectionTimeoutMS: 5000,
+    bufferCommands: false
+})
+    .then(() => console.log("Connected to MongoDB: XRcisingDB"))
+    .catch(err => console.error("MongoDB connection error:", err));
 
 // const yargs = require('yargs');
 // based on examples at https://www.npmjs.com/package/ws
@@ -49,6 +59,68 @@ const serverConfig =
 
 // Create a server for the client html page
 const handleRequest = function (request, response) {
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+    if (request.method === "OPTIONS") {
+        response.writeHead(200);
+        response.end();
+        return;
+    }
+
+    if (request.method === "POST") {
+        let body = "";
+        request.on("data", chunk => { body += chunk.toString(); });
+        request.on("end", async () => {
+            response.setHeader("Content-Type", "application/json");
+            try {
+                const data = JSON.parse(body);
+                if (request.url === "/api/register") {
+                    const { username, password } = data;
+                    if (!username || !password) {
+                        response.writeHead(400);
+                        return response.end(JSON.stringify({ error: "Username and password required" }));
+                    }
+                    if (password.length < 8) {
+                        response.writeHead(400);
+                        return response.end(JSON.stringify({ error: "Password must be at least 8 characters" }));
+                    }
+                    const existing = await User.findOne({ username });
+                    if (existing) {
+                        response.writeHead(409);
+                        return response.end(JSON.stringify({ error: "Username already taken" }));
+                    }
+                    const hash = await bcrypt.hash(password, 10);
+                    await new User({ username, password: hash }).save();
+                    response.writeHead(201);
+                    return response.end(JSON.stringify({ message: "Account created", username }));
+                } else if (request.url === "/api/login") {
+                    const { username, password } = data;
+                    if (!username || !password) {
+                        response.writeHead(400);
+                        return response.end(JSON.stringify({ error: "Username and password required" }));
+                    }
+                    const user = await User.findOne({ username });
+                    if (!user || !(await bcrypt.compare(password, user.password))) {
+                        response.writeHead(401);
+                        return response.end(JSON.stringify({ error: "Invalid username or password" }));
+                    }
+                    response.writeHead(200);
+                    return response.end(JSON.stringify({ message: "Login successful", username }));
+                } else {
+                    response.writeHead(404);
+                    return response.end(JSON.stringify({ error: "Not found" }));
+                }
+            } catch (err) {
+                console.error("API error:", err);
+                response.writeHead(500);
+                return response.end(JSON.stringify({ error: "Server error" }));
+            }
+        });
+        return;
+    }
+
     // Render the single client html file for any request the HTTP server receives
     // console.log('request received: ' + request.url);
     if (request.url.endsWith(".png")) {

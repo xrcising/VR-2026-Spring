@@ -20,6 +20,7 @@ import { initPauseMenu } from "./menus/pauseMenu.js";
 import { initSettingsMenu } from "./menus/settingsMenu.js";
 import { initFitnessStudioMenu } from "./menus/fitnessStudioMenu.js";
 import { initDancingMenu } from "./menus/dancingMenu.js";
+import { initUserMenu } from "./menus/userMenu.js";
 
 let lFanAngle = 0;
 let rFanAngle = 0;
@@ -342,6 +343,7 @@ export const init = async model => {
       isSongPlaying = true;
    });
    let dancingMenu = initDancingMenu(model, 10);
+   let userMenu = initUserMenu(model, 11);
 
    for (let t of tracks) t.track.opacity(0);
 
@@ -418,6 +420,7 @@ export const init = async model => {
       startMenu.obj.opacity(Router.currentRoute === 'startMenu' ? 1 : 0);
       fitnessStudioMenu.obj.opacity(Router.currentRoute === 'startMenu' ? 1 : 0);
       dancingMenu.obj.opacity(Router.currentRoute === 'startMenu' ? 1 : 0);
+      userMenu.obj.opacity(Router.currentRoute === 'startMenu' ? 1 : 0);
       songSelect.obj.opacity(Router.currentRoute === 'songSelect' ? 1 : 0);
       songInspect.obj.opacity(Router.currentRoute === 'songInspect' ? 1 : 0);
       playingSong.obj.opacity(Router.currentRoute === 'playingSong' ? 1 : 0);
@@ -473,6 +476,7 @@ export const init = async model => {
          startMenu.g2.update();
          fitnessStudioMenu.g2.update();
          dancingMenu.g2.update();
+         userMenu.g2.update();
       } else if (Router.currentRoute === 'songSelect') {
          songSelect.g2.update();
       } else if (Router.currentRoute === 'songInspect') {

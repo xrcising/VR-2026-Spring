@@ -1,0 +1,109 @@
+.settings-max { max-width: 560px; }
+
+.settings-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.settings-card h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.settings-card .card-desc {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.38);
+  margin-bottom: 1.5rem;
+}
+
+.danger-card {
+  border-color: rgba(255,60,60,0.22);
+  background: rgba(255,30,30,0.04);
+}
+
+.danger-card h3 { color: #ff6060; }
+
+.form-field { margin-bottom: 1.1rem; }
+
+.form-field label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.38);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 0.35rem;
+}
+
+.form-field input {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.9rem;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.form-field input:focus {
+  border-color: rgba(255,107,157,0.5);
+  background: rgba(255,255,255,0.08);
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.status-msg { font-size: 0.8rem; }
+
+.btn-danger {
+  padding: 0.6rem 1.5rem;
+  background: rgba(255,60,60,0.12);
+  border: 1px solid rgba(255,60,60,0.3);
+  border-radius: 7px;
+  color: #ff6060;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-danger:hover { background: rgba(255,60,60,0.22); }
+
+.auth-gate { text-align: center; padding: 6rem 2rem; }
+.auth-gate h2 { font-size: 1.4rem; margin-bottom: 0.65rem; }
+.auth-gate p { color: rgba(255,255,255,0.45); margin-bottom: 1.5rem; font-size: 0.95rem; }
+
+.confirm-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.72);
+  z-index: 600;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-backdrop.active { display: flex; }
+
+.confirm-box {
+  background: #16162a;
+  border: 1px solid rgba(255,60,60,0.28);
+  border-radius: 14px;
+  padding: 2rem;
+  width: 360px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.65);
+}
+
+.confirm-box h3 { font-size: 1.05rem; color: #ff6060; margin-bottom: 0.45rem; }
+.confirm-box p { font-size: 0.83rem; color: rgba(255,255,255,0.45); margin-bottom: 1.2rem; line-height: 1.55; }
