@@ -18,6 +18,8 @@ import { initSongInspect } from "./menus/songInspect.js";
 import { initPlayingSong } from "./menus/playingSong.js";
 import { initPauseMenu } from "./menus/pauseMenu.js";
 import { initSettingsMenu } from "./menus/settingsMenu.js";
+import { initFitnessStudioMenu } from "./menus/fitnessStudioMenu.js";
+import { initDancingMenu } from "./menus/dancingMenu.js";
 
 let lFanAngle = 0;
 let rFanAngle = 0;
@@ -83,6 +85,7 @@ loadSongs.push(loadSound('../../media/sound/xrcisingSongs/Rocky Road to Dublin -
 loadSongs.push(loadSound('../../media/sound/xrcisingSongs/Rasputin - Love The Way You Move (Funk Overload).mp3', buffer => songBuffer[1] = buffer));
 loadSongs.push(loadSound('../../media/sound/xrcisingSongs/thegrid.wav', buffer => songBuffer[2] = buffer));
 loadSongs.push(loadSound('../../media/sound/xrcisingSongs/LOOP3.WAV', buffer => songBuffer[3] = buffer)); // main menu music
+loadSongs.push(loadSound('../../media/sound/fitnessSongs/ambient-zen.mp3', buffer => songBuffer[4] = buffer)); // fitness studio music
 
 Promise.all(loadSounds);
 Promise.all(loadSongs);
@@ -109,13 +112,17 @@ export const init = async model => {
    let lfan_color = [0, 0, 1];
    let rfan_color = [1, 0, 0];
 
+   let mat_color = [0, 0, 1];
+
    let lfan_front = model.add('halfDiskX').color(lfan_color);
    let lfan_back = model.add('halfDiskX').color(lfan_color);
    let rfan_front = model.add('halfDiskX').color(rfan_color);
    let rfan_back = model.add('halfDiskX').color(rfan_color);
 
-   let lHitbox = model.add('tubeZ').color(lfan_color).opacity(0.75);
-   let rHitbox = model.add('tubeZ').color(rfan_color).opacity(0.75);
+   let lHitbox = model.add('tubeZ').color(lfan_color);//.opacity(0.75);
+   let rHitbox = model.add('tubeZ').color(rfan_color);//.opacity(0.75);
+
+   let fitnessMat = model.add('square').color(mat_color);
 
    // tracks
    let tracks = [];
@@ -328,6 +335,14 @@ export const init = async model => {
       }
    });
 
+   let fitnessStudioMenu = initFitnessStudioMenu(model, 9, () => {
+      if (selectedSong !== -1) stopSong();
+      playSong(4);
+      selectedSong = 4;
+      isSongPlaying = true;
+   });
+   let dancingMenu = initDancingMenu(model, 10);
+
    for (let t of tracks) t.track.opacity(0);
 
    let lBeam = new ControllerBeam(model, 'left');
@@ -377,7 +392,7 @@ export const init = async model => {
                 .setMatrix(controllerMatrix.left)
                 .move(0, 0, -0.5) // Shift it forward so it starts at the controller base
                 .scale(0.04, 0.04, 0.5) // Thin it out, and scale length to 1 unit
-                .opacity(isSongPlaying ? .5 : 0);
+                .opacity(isSongPlaying ? 1 : 0);
       }
       
       if (controllerMatrix.right) {
@@ -385,8 +400,14 @@ export const init = async model => {
                 .setMatrix(controllerMatrix.right)
                 .move(0, 0, -0.5)
                 .scale(0.04, 0.04, 0.5)
-                .opacity(isSongPlaying ? .5 : 0);
+                .opacity(isSongPlaying ? 1 : 0);
       }
+
+      // Render mat in fitness studio
+      fitnessMat.identity()
+                .scale(1.2, .4, .5)
+                .turnX(-Math.PI/2)
+                .opacity(Router.currentRoute === 'fitnessStudio' ? .6 : 0);
 
       // Render tracks
       renderTracks(tracks);
@@ -395,6 +416,8 @@ export const init = async model => {
 
       // 2. Manage Visibility
       startMenu.obj.opacity(Router.currentRoute === 'startMenu' ? 1 : 0);
+      fitnessStudioMenu.obj.opacity(Router.currentRoute === 'startMenu' ? 1 : 0);
+      dancingMenu.obj.opacity(Router.currentRoute === 'startMenu' ? 1 : 0);
       songSelect.obj.opacity(Router.currentRoute === 'songSelect' ? 1 : 0);
       songInspect.obj.opacity(Router.currentRoute === 'songInspect' ? 1 : 0);
       playingSong.obj.opacity(Router.currentRoute === 'playingSong' ? 1 : 0);
@@ -448,6 +471,8 @@ export const init = async model => {
       // 3. Update the active G2 canvas
       if (Router.currentRoute === 'startMenu') {
          startMenu.g2.update();
+         fitnessStudioMenu.g2.update();
+         dancingMenu.g2.update();
       } else if (Router.currentRoute === 'songSelect') {
          songSelect.g2.update();
       } else if (Router.currentRoute === 'songInspect') {
@@ -591,5 +616,7 @@ export const init = async model => {
          }
       }
    }
+
+   let renderFitnessStudio = () => {}
 
 }
