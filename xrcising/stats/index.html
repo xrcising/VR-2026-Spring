@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png" />
+  <link rel="stylesheet" href="../landing.css" />
+  <link rel="stylesheet" href="stats.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <title>stats &mdash; xrcising</title>
+</head>
+<body>
+
+  <nav class="landing-nav">
+    <div class="landing-nav__left">
+      <a class="landing-nav__logo" href="../">xrcising</a>
+      <a class="landing-nav__link" href="../">home</a>
+      <a class="landing-nav__link" href="../songs/">songs</a>
+      <a class="landing-nav__link" href="../rankings/">rankings</a>
+      <a class="landing-nav__link" href="../help/">help</a>
+    </div>
+    <div class="landing-nav__right">
+      <div class="lang-picker">
+        <i class="fas fa-globe" style="margin-right:5px;font-size:0.75rem;"></i>English
+        <div class="lang-dropdown">
+          <span class="lang-option">English</span>
+          <span class="lang-option">Español (not yet)</span>
+          <span class="lang-option">Français (not yet)</span>
+          <span class="lang-option">Deutsch (not yet)</span>
+          <span class="lang-option">日本語 (まだまだ)</span>
+          <span class="lang-option">한국어 (not yet)</span>
+          <span class="lang-option">中文 (not yet)</span>
+        </div>
+      </div>
+      <button id="btn-signin" class="btn-signin" onclick="openModal('signin')">sign in</button>
+      <div id="user-profile-menu" class="user-profile-menu" style="display:none;">
+        <button class="btn-profile" onclick="toggleUserProfile()">
+          <i class="fas fa-user-circle"></i>
+        </button>
+        <div id="user-dropdown" class="user-dropdown">
+          <a href="../stats/" class="user-option">my stats</a>
+          <a href="../account/" class="user-option">account</a>
+          <a href="../settings/" class="user-option">settings</a>
+          <a href="javascript:void(0)" class="user-option" onclick="logout()">logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-content">
+    <div class="page-header">
+      <div class="page-header__inner">
+        <h1>my <span>stats</span></h1>
+        <p id="stats-subtitle">your performance across all games</p>
+      </div>
+    </div>
+
+    <div id="auth-gate" class="auth-gate" style="display:none;">
+      <h2>sign in to view your stats</h2>
+      <p>you need to be signed in to access this page</p>
+      <button class="btn-cta" onclick="openModal('signin')">sign in</button>
+    </div>
+
+    <div id="stats-content" class="section" style="display:none;">
+
+      <!-- Summary row -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="sc-icon"><i class="fas fa-gamepad"></i></div>
+          <div class="sc-value" id="sum-sessions">—</div>
+          <div class="sc-label">total sessions</div>
+        </div>
+        <div class="summary-card">
+          <div class="sc-icon"><i class="fas fa-fire" style="color:#ff6b9d;"></i></div>
+          <div class="sc-value" id="sum-calories">—</div>
+          <div class="sc-label">calories burned</div>
+        </div>
+        <div class="summary-card">
+          <div class="sc-icon"><i class="fas fa-clock" style="color:#4d9fff;"></i></div>
+          <div class="sc-value" id="sum-time">—</div>
+          <div class="sc-label">total play time</div>
+        </div>
+      </div>
+
+      <!-- Game tabs -->
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="showGame('xrcising', this)">xrcising</button>
+        <button class="tab-btn" onclick="showGame('fitnessStudio', this)">fitness studio</button>
+        <button class="tab-btn" onclick="showGame('dancingMachine', this)">dancing machine</button>
+      </div>
+
+      <div id="panel-xrcising" class="game-panel active"></div>
+      <div id="panel-fitnessStudio" class="game-panel"></div>
+      <div id="panel-dancingMachine" class="game-panel"></div>
+
+    </div>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tab-signin" onclick="switchTab('signin')">sign in</button>
+        <button class="modal-tab" id="tab-register" onclick="switchTab('register')">create account</button>
+      </div>
+      <div id="form-signin" class="modal-form">
+        <div><label for="username">username</label><input type="text" id="username" autocomplete="username" /></div>
+        <div><label for="password">password</label><input type="password" id="password" autocomplete="current-password" /></div>
+        <div id="login-status" class="modal-status"></div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="login()">sign in</button>
+          <button class="btn-secondary" onclick="closeModal()">cancel</button>
+        </div>
+      </div>
+      <div id="form-register" class="modal-form" style="display:none;">
+        <div><label for="reg-username">username</label><input type="text" id="reg-username" autocomplete="username" /></div>
+        <div><label for="reg-password">password (min 8 characters)</label><input type="password" id="reg-password" autocomplete="new-password" /></div>
+        <div><label for="reg-confirm">confirm password</label><input type="password" id="reg-confirm" autocomplete="new-password" /></div>
+        <div id="reg-status" class="modal-status"></div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="register()">register</button>
+          <button class="btn-secondary" onclick="closeModal()">cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="landing-footer">
+    <div class="footer-inner">
+      <div class="footer-col"><h4>General</h4><a href="../">Home</a><a href="../songs/">Songs</a><a href="../rankings/">Rankings</a></div>
+      <div class="footer-col"><h4>Help &amp; Support</h4><a href="../help/">FAQ</a><a href="../help/">How to Play</a><a href="../help/">Contact</a></div>
+      <div class="footer-col"><h4>Legal</h4><a href="#">Terms of Service</a><a href="#">Privacy Policy</a></div>
+    </div>
+    <div class="footer-bottom">xrcising &mdash; NYU VR Course 2026</div>
+  </footer>
+
+  <script>
+    async function apiPost(path, body) {
+      const res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      let data = {}; try { data = await res.json(); } catch (_) {}
+      return { ok: res.ok, data };
+    }
+    function openModal(tab) { document.getElementById('modal-overlay').classList.add('active'); switchTab(tab || 'signin'); }
+    function closeModal() { document.getElementById('modal-overlay').classList.remove('active'); }
+    function switchTab(tab) {
+      const s = tab === 'signin';
+      document.getElementById('tab-signin').classList.toggle('active', s);
+      document.getElementById('tab-register').classList.toggle('active', !s);
+      document.getElementById('form-signin').style.display = s ? 'flex' : 'none';
+      document.getElementById('form-register').style.display = s ? 'none' : 'flex';
+    }
+    document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target === document.getElementById('modal-overlay')) closeModal(); });
+
+    async function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const status = document.getElementById('login-status');
+      if (!username || !password) { status.style.color = '#ff6b6b'; status.textContent = 'Please enter a username and password.'; return; }
+      try {
+        const { ok, data } = await apiPost('/api/login', { username, password });
+        if (ok) { localStorage.setItem('xrcising_username', data.username); window.location.reload(); }
+        else { status.style.color = '#ff6b6b'; status.textContent = data.error || 'Login failed.'; }
+      } catch (e) { status.style.color = '#ff6b6b'; status.textContent = `Error: ${e.message}`; }
+    }
+    async function register() {
+      const username = document.getElementById('reg-username').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const confirm = document.getElementById('reg-confirm').value;
+      const status = document.getElementById('reg-status');
+      if (!username || !password || !confirm) { status.textContent = 'All fields are required.'; return; }
+      if (password.length < 8) { status.textContent = 'Password must be at least 8 characters.'; return; }
+      if (password !== confirm) { status.textContent = 'Passwords do not match.'; return; }
+      try {
+        const { ok, data } = await apiPost('/api/register', { username, password });
+        if (ok) { localStorage.setItem('xrcising_username', username); window.location.reload(); }
+        else { status.style.color = '#ff6b6b'; status.textContent = data.error || 'Registration failed.'; }
+      } catch (e) { status.style.color = '#ff6b6b'; status.textContent = `Error: ${e.message}`; }
+    }
+    function toggleUserProfile() { const d = document.getElementById('user-dropdown'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; }
+    function logout() { localStorage.removeItem('xrcising_username'); window.location.href = '../'; }
+    document.addEventListener('click', e => {
+      const m = document.getElementById('user-profile-menu');
+      if (m && !m.contains(e.target)) { const d = document.getElementById('user-dropdown'); if (d) d.style.display = 'none'; }
+    });
+
+    // ── Mock data ──
+    function seededRand(seed) {
+      let s = Math.abs(seed) || 1;
+      return () => { s = (s * 16807 + 0) % 2147483647; return (s - 1) / 2147483646; };
+    }
+    function generateMockStats(username) {
+      const seed = username.split('').reduce((h, c, i) => Math.imul(31, h) + c.charCodeAt(0) | 0, 7);
+      const r = seededRand(Math.abs(seed));
+      const ri = (a, b) => Math.floor(r() * (b - a + 1)) + a;
+      const games = ['xrcising', 'fitnessStudio', 'dancingMachine'];
+      const result = {};
+      for (let gi = 0; gi < 3; gi++) {
+        const sessions = ri(9, 24);
+        const recent = Array.from({ length: 5 }, (_, i) => ({
+          date: new Date(Date.now() - (i + 1) * ri(1, 4) * 86400000),
+          score: ri(750, 9600),
+          duration: ri(200, 2700),
+          calories: ri(40, 320)
+        }));
+        result[games[gi]] = {
+          totalSessions: sessions,
+          totalCalories: ri(700, 7500),
+          totalTime: ri(4000, 86400),
+          highScore: Math.max(...recent.map(s => s.score)) + ri(0, 1200),
+          globalRank: ri(55, 4800),
+          recentSessions: recent
+        };
+      }
+      return result;
+    }
+
+    function fmtNum(n) { return n.toLocaleString(); }
+    function fmtTime(secs) {
+      const h = Math.floor(secs / 3600);
+      const m = Math.floor((secs % 3600) / 60);
+      return h > 0 ? `${h}h ${m}m` : `${m}m`;
+    }
+    function fmtDate(d) {
+      return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function renderGamePanel(panelId, name, gs, isMock) {
+      const panel = document.getElementById(panelId);
+      const mockBadge = isMock ? `<span class="mock-notice"><i class="fas fa-flask" style="font-size:0.65rem;"></i>sample data</span>` : '';
+      const rows = (gs.recentSessions || []).map(s => `
+        <tr>
+          <td>${fmtDate(s.date)}</td>
+          <td class="score-cell">${fmtNum(s.score)}</td>
+          <td>${fmtTime(s.duration)}</td>
+          <td>${fmtNum(s.calories)} kcal</td>
+        </tr>`).join('');
+
+      panel.innerHTML = `
+        <div class="game-header">
+          <span class="game-title">${name}</span>
+          <span class="rank-badge"><i class="fas fa-trophy" style="font-size:0.7rem;"></i>#${fmtNum(gs.globalRank || 0)}</span>
+          ${mockBadge}
+        </div>
+        <div class="game-mini-stats">
+          <div class="mini-stat"><div class="ms-val">${fmtNum(gs.highScore)}</div><div class="ms-lbl">high score</div></div>
+          <div class="mini-stat"><div class="ms-val">${fmtNum(gs.totalSessions)}</div><div class="ms-lbl">sessions played</div></div>
+          <div class="mini-stat"><div class="ms-val">${fmtTime(gs.totalTime)}</div><div class="ms-lbl">time played</div></div>
+        </div>
+        <div class="section-label">recent sessions</div>
+        <table class="sessions-table">
+          <thead><tr><th>date</th><th>score</th><th>duration</th><th>calories</th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="4" style="color:rgba(255,255,255,0.3);padding:1.5rem 0.85rem;">no sessions yet</td></tr>'}</tbody>
+        </table>`;
+    }
+
+    function showGame(gameKey, btn) {
+      document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`panel-${gameKey}`).classList.add('active');
+      if (btn) btn.classList.add('active');
+    }
+
+    // ── Page logic ──
+    const loggedInUser = localStorage.getItem('xrcising_username');
+
+    if (!loggedInUser) {
+      document.getElementById('auth-gate').style.display = 'block';
+    } else {
+      document.getElementById('btn-signin').style.display = 'none';
+      document.getElementById('user-profile-menu').style.display = 'block';
+      document.getElementById('stats-content').style.display = 'block';
+      loadStats();
+    }
+
+    async function loadStats() {
+      let userData = null;
+      try {
+        const res = await fetch(`/api/user/${encodeURIComponent(loggedInUser)}`);
+        if (res.ok) userData = await res.json();
+      } catch (e) { console.error(e); }
+
+      let stats = userData?.stats;
+      let isMock = false;
+
+      const hasData = stats &&
+        (stats.xrcising?.totalSessions > 0 ||
+         stats.fitnessStudio?.totalSessions > 0 ||
+         stats.dancingMachine?.totalSessions > 0);
+
+      if (!hasData) {
+        stats = generateMockStats(loggedInUser);
+        isMock = true;
+      }
+
+      const totalSessions = (stats.xrcising.totalSessions || 0)
+                          + (stats.fitnessStudio.totalSessions || 0)
+                          + (stats.dancingMachine.totalSessions || 0);
+      const totalCalories = (stats.xrcising.totalCalories || 0)
+                          + (stats.fitnessStudio.totalCalories || 0)
+                          + (stats.dancingMachine.totalCalories || 0);
+      const totalTime = (stats.xrcising.totalTime || 0)
+                      + (stats.fitnessStudio.totalTime || 0)
+                      + (stats.dancingMachine.totalTime || 0);
+
+      document.getElementById('sum-sessions').textContent = fmtNum(totalSessions);
+      document.getElementById('sum-calories').textContent = fmtNum(totalCalories);
+      document.getElementById('sum-time').textContent = fmtTime(totalTime);
+
+      renderGamePanel('panel-xrcising',       'xrcising',        stats.xrcising,       isMock);
+      renderGamePanel('panel-fitnessStudio',  'fitness studio',  stats.fitnessStudio,  isMock);
+      renderGamePanel('panel-dancingMachine', 'dancing machine', stats.dancingMachine, isMock);
+    }
+  </script>
+</body>
+</html>

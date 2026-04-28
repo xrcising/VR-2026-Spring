@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png" />
+  <link rel="stylesheet" href="../landing.css" />
+  <link rel="stylesheet" href="rankings.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <title>rankings &mdash; xrcising</title>
+</head>
+<body>
+
+  <!-- ─── NAV ─── -->
+  <nav class="landing-nav">
+    <div class="landing-nav__left">
+      <a class="landing-nav__logo" href="../">xrcising</a>
+      <a class="landing-nav__link" href="../">home</a>
+      <a class="landing-nav__link" href="../songs/">songs</a>
+      <a class="landing-nav__link landing-nav__link--active" href="../rankings/">rankings</a>
+      <a class="landing-nav__link" href="../help/">help</a>
+    </div>
+    <div class="landing-nav__right">
+      <div class="lang-picker">
+        <i class="fas fa-globe" style="margin-right:5px;font-size:0.75rem;"></i>English
+        <div class="lang-dropdown">
+          <span class="lang-option">English</span>
+          <span class="lang-option">Español</span>
+          <span class="lang-option">Français</span>
+          <span class="lang-option">Deutsch</span>
+          <span class="lang-option">日本語</span>
+          <span class="lang-option">한국어</span>
+          <span class="lang-option">中文</span>
+        </div>
+      </div>
+      <button id="btn-signin" class="btn-signin" onclick="openModal('signin')">sign in</button>
+      <div id="user-profile-menu" class="user-profile-menu" style="display:none;">
+        <button class="btn-profile" onclick="toggleUserProfile()">
+          <i class="fas fa-user-circle"></i>
+        </button>
+        <div id="user-dropdown" class="user-dropdown">
+          <a href="../stats/" class="user-option">my stats</a>
+          <a href="../account/" class="user-option">account</a>
+          <a href="../settings/" class="user-option">settings</a>
+          <a href="javascript:void(0)" class="user-option" onclick="logout()">logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-content">
+    <div class="page-header">
+      <div class="page-header__inner">
+        <h1>global <span>rankings</span></h1>
+        <p>see where you stand against players worldwide</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="tab-row">
+        <button class="tab-btn active">global</button>
+        <button class="tab-btn">this week</button>
+        <button class="tab-btn">by song</button>
+      </div>
+
+      <table class="rankings-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>player</th>
+            <th>score</th>
+            <th>accuracy</th>
+            <th>songs played</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="rank-num rank-num--gold">1</td>
+            <td class="player-name">User1</td>
+            <td class="score">2,847,300</td>
+            <td>99.1%</td>
+            <td>341</td>
+          </tr>
+          <tr>
+            <td class="rank-num rank-num--silver">2</td>
+            <td class="player-name">User2</td>
+            <td class="score">2,613,900</td>
+            <td>98.4%</td>
+            <td>287</td>
+          </tr>
+          <tr>
+            <td class="rank-num rank-num--bronze">3</td>
+            <td class="player-name">User3</td>
+            <td class="score">2,401,750</td>
+            <td>97.8%</td>
+            <td>312</td>
+          </tr>
+          <tr>
+            <td class="rank-num">4</td>
+            <td class="player-name">User4</td>
+            <td class="score">2,188,400</td>
+            <td>96.9%</td>
+            <td>201</td>
+          </tr>
+          <tr>
+            <td class="rank-num">5</td>
+            <td class="player-name">User5</td>
+            <td class="score">1,994,200</td>
+            <td>96.2%</td>
+            <td>178</td>
+          </tr>
+          <tr>
+            <td class="rank-num">6</td>
+            <td class="player-name">User6</td>
+            <td class="score">1,847,600</td>
+            <td>95.5%</td>
+            <td>164</td>
+          </tr>
+          <tr>
+            <td class="rank-num">7</td>
+            <td class="player-name">User7</td>
+            <td class="score">1,700,100</td>
+            <td>94.8%</td>
+            <td>143</td>
+          </tr>
+          <tr>
+            <td class="rank-num">8</td>
+            <td class="player-name">User8</td>
+            <td class="score">1,512,900</td>
+            <td>94.1%</td>
+            <td>129</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─── SIGN IN MODAL ─── -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tab-signin" onclick="switchTab('signin')">sign in</button>
+        <button class="modal-tab" id="tab-register" onclick="switchTab('register')">create account</button>
+      </div>
+      <div id="form-signin" class="modal-form">
+        <div><label for="username">username</label><input type="text" id="username" autocomplete="username" /></div>
+        <div><label for="password">password</label><input type="password" id="password" autocomplete="current-password" /></div>
+        <div id="login-status" class="modal-status"></div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="login()">sign in</button>
+          <button class="btn-secondary" onclick="closeModal()">cancel</button>
+        </div>
+      </div>
+      <div id="form-register" class="modal-form" style="display:none;">
+        <div><label for="reg-username">username</label><input type="text" id="reg-username" autocomplete="username" /></div>
+        <div><label for="reg-password">password (min 8 characters)</label><input type="password" id="reg-password" autocomplete="new-password" /></div>
+        <div><label for="reg-confirm">confirm password</label><input type="password" id="reg-confirm" autocomplete="new-password" /></div>
+        <div id="reg-status" class="modal-status"></div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="register()">register</button>
+          <button class="btn-secondary" onclick="closeModal()">cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="landing-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4>General</h4>
+        <a href="../">Home</a>
+        <a href="../songs/">Songs</a>
+        <a href="../rankings/">Rankings</a>
+      </div>
+      <div class="footer-col">
+        <h4>Help &amp; Support</h4>
+        <a href="../help/">FAQ</a>
+        <a href="../help/">How to Play</a>
+        <a href="../help/">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="#">Terms of Service</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">xrcising &mdash; NYU VR Course 2026</div>
+  </footer>
+
+  <script>
+    function openModal(tab) { document.getElementById('modal-overlay').classList.add('active'); switchTab(tab || 'signin'); }
+    function closeModal() { document.getElementById('modal-overlay').classList.remove('active'); }
+    function switchTab(tab) {
+      const s = tab === 'signin';
+      document.getElementById('tab-signin').classList.toggle('active', s);
+      document.getElementById('tab-register').classList.toggle('active', !s);
+      document.getElementById('form-signin').style.display = s ? 'flex' : 'none';
+      document.getElementById('form-register').style.display = s ? 'none' : 'flex';
+    }
+    document.getElementById('modal-overlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('modal-overlay')) closeModal();
+    });
+
+    function toggleUserProfile() {
+      const d = document.getElementById('user-dropdown');
+      d.style.display = d.style.display === 'block' ? 'none' : 'block';
+    }
+    function logout() {
+      localStorage.removeItem('xrcising_username');
+      window.location.href = '../';
+    }
+    document.addEventListener('click', e => {
+      const m = document.getElementById('user-profile-menu');
+      if (m && !m.contains(e.target)) { const d = document.getElementById('user-dropdown'); if (d) d.style.display = 'none'; }
+    });
+
+    async function apiPost(path, body) {
+      const res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      let data = {}; try { data = await res.json(); } catch (_) {}
+      return { ok: res.ok, data };
+    }
+
+    async function login() {
+      const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value, s = document.getElementById('login-status');
+      if (!u || !p) { s.style.color = '#ff6b6b'; s.textContent = 'Please enter a username and password.'; return; }
+      try {
+        const { ok, data } = await apiPost('/api/login', { username: u, password: p });
+        if (ok) {
+          localStorage.setItem('xrcising_username', data.username);
+          closeModal();
+          document.getElementById('btn-signin').style.display = 'none';
+          document.getElementById('user-profile-menu').style.display = 'block';
+        } else { s.style.color = '#ff6b6b'; s.textContent = data.error || 'Login failed.'; }
+      } catch (e) { s.style.color = '#ff6b6b'; s.textContent = `Error: ${e.message}`; }
+    }
+
+    async function register() {
+      const u = document.getElementById('reg-username').value.trim(), p = document.getElementById('reg-password').value, c = document.getElementById('reg-confirm').value, s = document.getElementById('reg-status');
+      if (!u || !p || !c) { s.textContent = 'All fields are required.'; return; }
+      if (p.length < 8) { s.textContent = 'Password must be at least 8 characters.'; return; }
+      if (p !== c) { s.textContent = 'Passwords do not match.'; return; }
+      try {
+        const { ok, data } = await apiPost('/api/register', { username: u, password: p });
+        if (ok) {
+          localStorage.setItem('xrcising_username', u);
+          closeModal();
+          document.getElementById('btn-signin').style.display = 'none';
+          document.getElementById('user-profile-menu').style.display = 'block';
+        } else { s.style.color = '#ff6b6b'; s.textContent = data.error || 'Registration failed.'; }
+      } catch (e) { s.style.color = '#ff6b6b'; s.textContent = `Error: ${e.message}`; }
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // Restore auth state on load
+    (function () {
+      const saved = localStorage.getItem('xrcising_username');
+      if (saved) {
+        document.getElementById('btn-signin').style.display = 'none';
+        document.getElementById('user-profile-menu').style.display = 'block';
+      }
+    })();
+  </script>
+</body>
+</html>

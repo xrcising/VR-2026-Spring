@@ -1,0 +1,140 @@
+.profile-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  padding-top: 0.5rem;
+}
+
+.avatar-circle {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.92);
+  user-select: none;
+  transition: background 0.25s;
+}
+
+.swatch-label {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.color-swatches {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.12s, border-color 0.12s;
+}
+
+.color-swatch.selected {
+  border-color: #fff;
+  transform: scale(1.22);
+}
+
+.form-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.username-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 0.28rem 0.8rem;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 1.5rem;
+}
+
+.form-field { margin-bottom: 1.15rem; }
+
+.form-field label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.38);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 0.38rem;
+}
+
+.form-field input,
+.form-field textarea {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.9rem;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+  border-color: rgba(255,107,157,0.5);
+  background: rgba(255,255,255,0.08);
+}
+
+.form-field textarea {
+  resize: vertical;
+  min-height: 78px;
+}
+
+.save-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.4rem;
+}
+
+.save-status { font-size: 0.8rem; }
+
+.meta-info {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.3);
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.meta-info span { color: rgba(255,255,255,0.5); }
+
+.auth-gate { text-align: center; padding: 6rem 2rem; }
+.auth-gate h2 { font-size: 1.4rem; margin-bottom: 0.65rem; }
+.auth-gate p { color: rgba(255,255,255,0.45); margin-bottom: 1.5rem; font-size: 0.95rem; }
+
+@media (max-width: 640px) {
+  .profile-grid { grid-template-columns: 1fr; }
+}

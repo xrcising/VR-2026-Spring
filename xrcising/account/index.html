@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png" />
+  <link rel="stylesheet" href="../landing.css" />
+  <link rel="stylesheet" href="account.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <title>account &mdash; xrcising</title>
+</head>
+<body>
+
+  <nav class="landing-nav">
+    <div class="landing-nav__left">
+      <a class="landing-nav__logo" href="../">xrcising</a>
+      <a class="landing-nav__link" href="../">home</a>
+      <a class="landing-nav__link" href="../songs/">songs</a>
+      <a class="landing-nav__link" href="../rankings/">rankings</a>
+      <a class="landing-nav__link" href="../help/">help</a>
+    </div>
+    <div class="landing-nav__right">
+      <div class="lang-picker">
+        <i class="fas fa-globe" style="margin-right:5px;font-size:0.75rem;"></i>English
+        <div class="lang-dropdown">
+          <span class="lang-option">English</span>
+          <span class="lang-option">Español (not yet)</span>
+          <span class="lang-option">Français (not yet)</span>
+          <span class="lang-option">Deutsch (not yet)</span>
+          <span class="lang-option">日本語 (まだまだ)</span>
+          <span class="lang-option">한국어 (not yet)</span>
+          <span class="lang-option">中文 (not yet)</span>
+        </div>
+      </div>
+      <button id="btn-signin" class="btn-signin" onclick="openModal('signin')">sign in</button>
+      <div id="user-profile-menu" class="user-profile-menu" style="display:none;">
+        <button class="btn-profile" onclick="toggleUserProfile()">
+          <i class="fas fa-user-circle"></i>
+        </button>
+        <div id="user-dropdown" class="user-dropdown">
+          <a href="../stats/" class="user-option">my stats</a>
+          <a href="../account/" class="user-option">account</a>
+          <a href="../settings/" class="user-option">settings</a>
+          <a href="javascript:void(0)" class="user-option" onclick="logout()">logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-content">
+    <div class="page-header">
+      <div class="page-header__inner">
+        <h1>your <span>account</span></h1>
+        <p>manage your profile and personal info</p>
+      </div>
+    </div>
+
+    <div id="auth-gate" class="auth-gate" style="display:none;">
+      <h2>sign in to view your account</h2>
+      <p>you need to be signed in to access this page</p>
+      <button class="btn-cta" onclick="openModal('signin')">sign in</button>
+    </div>
+
+    <div id="account-content" class="section" style="display:none;">
+      <div class="profile-grid">
+        <div class="avatar-section">
+          <div class="avatar-circle" id="avatar-display" style="background:#c44dff;">
+            <span id="avatar-initials">?</span>
+          </div>
+          <div class="swatch-label">avatar color</div>
+          <div class="color-swatches" id="color-swatches">
+            <div class="color-swatch" data-color="#c44dff" style="background:#c44dff;" title="purple"></div>
+            <div class="color-swatch" data-color="#ff6b9d" style="background:#ff6b9d;" title="pink"></div>
+            <div class="color-swatch" data-color="#4d9fff" style="background:#4d9fff;" title="blue"></div>
+            <div class="color-swatch" data-color="#4dffb4" style="background:#4dffb4;" title="mint"></div>
+            <div class="color-swatch" data-color="#ff9f4d" style="background:#ff9f4d;" title="orange"></div>
+            <div class="color-swatch" data-color="#ff4d4d" style="background:#ff4d4d;" title="red"></div>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <div class="username-badge">
+            <i class="fas fa-at" style="font-size:0.72rem;color:#ff6b9d;"></i>
+            <span id="display-username">—</span>
+          </div>
+
+          <div class="form-field">
+            <label>display name</label>
+            <input type="text" id="field-displayname" placeholder="your name shown to others" maxlength="32" />
+          </div>
+
+          <div class="form-field">
+            <label>bio</label>
+            <textarea id="field-bio" placeholder="tell others a bit about yourself..." maxlength="160"></textarea>
+          </div>
+
+          <div class="save-row">
+            <button class="btn-primary" onclick="saveProfile()" style="flex:none;padding:0.6rem 1.75rem;">save changes</button>
+            <span class="save-status" id="save-status"></span>
+          </div>
+
+          <div class="meta-info">
+            member since <span id="member-since">—</span>
+            &nbsp;&middot;&nbsp;
+            <a href="../stats/" style="color:#ff6b9d;text-decoration:none;">view stats</a>
+            &nbsp;&middot;&nbsp;
+            <a href="../settings/" style="color:rgba(255,255,255,0.38);text-decoration:none;">settings</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tab-signin" onclick="switchTab('signin')">sign in</button>
+        <button class="modal-tab" id="tab-register" onclick="switchTab('register')">create account</button>
+      </div>
+      <div id="form-signin" class="modal-form">
+        <div><label for="username">username</label><input type="text" id="username" autocomplete="username" /></div>
+        <div><label for="password">password</label><input type="password" id="password" autocomplete="current-password" /></div>
+        <div id="login-status" class="modal-status"></div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="login()">sign in</button>
+          <button class="btn-secondary" onclick="closeModal()">cancel</button>
+        </div>
+      </div>
+      <div id="form-register" class="modal-form" style="display:none;">
+        <div><label for="reg-username">username</label><input type="text" id="reg-username" autocomplete="username" /></div>
+        <div><label for="reg-password">password (min 8 characters)</label><input type="password" id="reg-password" autocomplete="new-password" /></div>
+        <div><label for="reg-confirm">confirm password</label><input type="password" id="reg-confirm" autocomplete="new-password" /></div>
+        <div id="reg-status" class="modal-status"></div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="register()">register</button>
+          <button class="btn-secondary" onclick="closeModal()">cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="landing-footer">
+    <div class="footer-inner">
+      <div class="footer-col"><h4>General</h4><a href="../">Home</a><a href="../songs/">Songs</a><a href="../rankings/">Rankings</a></div>
+      <div class="footer-col"><h4>Help &amp; Support</h4><a href="../help/">FAQ</a><a href="../help/">How to Play</a><a href="../help/">Contact</a></div>
+      <div class="footer-col"><h4>Legal</h4><a href="#">Terms of Service</a><a href="#">Privacy Policy</a></div>
+    </div>
+    <div class="footer-bottom">xrcising &mdash; NYU VR Course 2026</div>
+  </footer>
+
+  <script>
+    async function apiPost(path, body) {
+      const res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      let data = {}; try { data = await res.json(); } catch (_) {}
+      return { ok: res.ok, data };
+    }
+    function openModal(tab) { document.getElementById('modal-overlay').classList.add('active'); switchTab(tab || 'signin'); }
+    function closeModal() { document.getElementById('modal-overlay').classList.remove('active'); }
+    function switchTab(tab) {
+      const s = tab === 'signin';
+      document.getElementById('tab-signin').classList.toggle('active', s);
+      document.getElementById('tab-register').classList.toggle('active', !s);
+      document.getElementById('form-signin').style.display = s ? 'flex' : 'none';
+      document.getElementById('form-register').style.display = s ? 'none' : 'flex';
+    }
+    document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target === document.getElementById('modal-overlay')) closeModal(); });
+
+    async function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const status = document.getElementById('login-status');
+      if (!username || !password) { status.style.color = '#ff6b6b'; status.textContent = 'Please enter a username and password.'; return; }
+      try {
+        const { ok, data } = await apiPost('/api/login', { username, password });
+        if (ok) { localStorage.setItem('xrcising_username', data.username); window.location.reload(); }
+        else { status.style.color = '#ff6b6b'; status.textContent = data.error || 'Login failed.'; }
+      } catch (e) { status.style.color = '#ff6b6b'; status.textContent = `Error: ${e.message}`; }
+    }
+    async function register() {
+      const username = document.getElementById('reg-username').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const confirm = document.getElementById('reg-confirm').value;
+      const status = document.getElementById('reg-status');
+      if (!username || !password || !confirm) { status.textContent = 'All fields are required.'; return; }
+      if (password.length < 8) { status.textContent = 'Password must be at least 8 characters.'; return; }
+      if (password !== confirm) { status.textContent = 'Passwords do not match.'; return; }
+      try {
+        const { ok, data } = await apiPost('/api/register', { username, password });
+        if (ok) { localStorage.setItem('xrcising_username', username); window.location.reload(); }
+        else { status.style.color = '#ff6b6b'; status.textContent = data.error || 'Registration failed.'; }
+      } catch (e) { status.style.color = '#ff6b6b'; status.textContent = `Error: ${e.message}`; }
+    }
+    function toggleUserProfile() { const d = document.getElementById('user-dropdown'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; }
+    function logout() { localStorage.removeItem('xrcising_username'); window.location.href = '../'; }
+    document.addEventListener('click', e => {
+      const m = document.getElementById('user-profile-menu');
+      if (m && !m.contains(e.target)) { const d = document.getElementById('user-dropdown'); if (d) d.style.display = 'none'; }
+    });
+
+    // ── Page logic ──
+    const loggedInUser = localStorage.getItem('xrcising_username');
+    let currentAvatarColor = '#c44dff';
+
+    if (!loggedInUser) {
+      document.getElementById('auth-gate').style.display = 'block';
+    } else {
+      document.getElementById('btn-signin').style.display = 'none';
+      document.getElementById('user-profile-menu').style.display = 'block';
+      document.getElementById('account-content').style.display = 'block';
+      document.getElementById('display-username').textContent = loggedInUser;
+      loadProfile();
+    }
+
+    async function loadProfile() {
+      try {
+        const res = await fetch(`/api/user/${encodeURIComponent(loggedInUser)}`);
+        if (!res.ok) return;
+        const user = await res.json();
+        document.getElementById('field-displayname').value = user.displayName || '';
+        document.getElementById('field-bio').value = user.bio || '';
+        const color = user.avatarColor || '#c44dff';
+        currentAvatarColor = color;
+        updateAvatar(loggedInUser, color);
+        const since = new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        document.getElementById('member-since').textContent = since;
+      } catch (e) { console.error(e); }
+    }
+
+    function updateAvatar(username, color) {
+      document.getElementById('avatar-display').style.background = color;
+      document.getElementById('avatar-initials').textContent = username.charAt(0).toUpperCase();
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.toggle('selected', s.dataset.color === color));
+    }
+
+    document.querySelectorAll('.color-swatch').forEach(s => {
+      s.addEventListener('click', () => { currentAvatarColor = s.dataset.color; updateAvatar(loggedInUser, currentAvatarColor); });
+    });
+
+    async function saveProfile() {
+      const status = document.getElementById('save-status');
+      status.textContent = 'saving...'; status.style.color = 'rgba(255,255,255,0.4)';
+      try {
+        const res = await fetch(`/api/user/${encodeURIComponent(loggedInUser)}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            displayName: document.getElementById('field-displayname').value.trim(),
+            bio: document.getElementById('field-bio').value.trim(),
+            avatarColor: currentAvatarColor
+          })
+        });
+        const data = await res.json();
+        if (res.ok) { status.style.color = '#6bff8e'; status.textContent = 'saved!'; setTimeout(() => status.textContent = '', 2500); }
+        else { status.style.color = '#ff6b6b'; status.textContent = data.error || 'failed to save'; }
+      } catch (e) { status.style.color = '#ff6b6b'; status.textContent = `error: ${e.message}`; }
+    }
+  </script>
+</body>
+</html>

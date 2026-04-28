@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<!--
+Copyright 2018 The Immersive Web Community Group
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png" />
+  <link rel="stylesheet" href="../css/common.css" />
+  <link rel="stylesheet" href="landing.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <title>xrcising</title>
+
+  <script src="../js/util/peerjs.min.js"></script>
+  <script src='../server/client.js'></script>
+  <script src='../js/wizard/things.js'></script>
+  <script src='../js/wizard/lib.js'></script>
+  <script src='../js/wizard/molecules.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/resonance-audio/build/resonance-audio.min.js"></script>
+  <script src="https://www.gstatic.com/external_hosted/omnitone/build/omnitone.min.js"></script>
+  <script src="../js/third-party/corelink.browser.lib.js"></script>
+  <script src="../js/buffer-browser.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+  <style>
+    /* Hero layout */
+    .hero {
+      min-height: calc(100vh - 56px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a0a2e 55%, #0f1a2e 100%);
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 25% 55%, rgba(120, 60, 255, 0.18) 0%, transparent 55%),
+        radial-gradient(ellipse at 75% 45%, rgba(255, 80, 140, 0.12) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    .hero__inner {
+      position: relative;
+      z-index: 2;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 3.5rem;
+      align-items: center;
+    }
+
+    .hero__content h1 {
+      font-size: clamp(2rem, 3.8vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.1rem;
+      letter-spacing: -1px;
+    }
+
+    .hero__content h1 span {
+      background: linear-gradient(90deg, #ff6b9d, #c44dff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero__content h2 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.55);
+      margin-bottom: 2.25rem;
+      line-height: 1.65;
+    }
+
+    .hero__stats {
+      margin-bottom: 2rem;
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .hero__stats strong {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .btn-cta {
+      display: inline-block;
+      background: linear-gradient(135deg, #ff6b9d, #c44dff);
+      color: #fff;
+      text-decoration: none;
+      padding: 0.8rem 2.25rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      box-shadow: 0 4px 20px rgba(196, 77, 255, 0.35);
+    }
+
+    .btn-cta:hover {
+      opacity: 0.88;
+      transform: translateY(-2px);
+    }
+
+    /* VR Preview window */
+    .hero__preview-wrap {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow:
+        0 24px 64px rgba(0, 0, 0, 0.65),
+        0 0 0 1px rgba(255, 255, 255, 0.07);
+      background: #0d0d1e;
+      aspect-ratio: 16 / 10;
+    }
+
+    #vr-preview {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    /* Redirect the dynamically-appended WebGL canvas into the preview box */
+    #vr-preview canvas {
+      position: absolute !important;
+      width: 100% !important;
+      height: 100% !important;
+      left: 0 !important;
+      top: 0 !important;
+      right: unset !important;
+      bottom: unset !important;
+    }
+
+    .preview-badge {
+      position: absolute;
+      bottom: 0.7rem;
+      left: 0.7rem;
+      z-index: 5;
+      font-size: 0.68rem;
+      color: rgba(255, 255, 255, 0.45);
+      background: rgba(0, 0, 0, 0.45);
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      pointer-events: none;
+      letter-spacing: 0.3px;
+    }
+
+    .preview-enter-btn {
+      position: absolute;
+      bottom: 0.7rem;
+      right: 0.7rem;
+      z-index: 5;
+      font-size: 0.75rem;
+      color: #fff;
+      background: rgba(255, 107, 157, 0.75);
+      padding: 0.25rem 0.7rem;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .preview-enter-btn:hover {
+      background: rgba(255, 107, 157, 0.95);
+    }
+
+    @media (max-width: 700px) {
+      .hero__inner {
+        grid-template-columns: 1fr;
+        padding: 2.5rem 1.25rem;
+      }
+      .hero__preview-wrap { aspect-ratio: 16/9; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Hidden header required by handle_scenes.js to attach the WebXR entry button -->
+  <div id="header" style="position:absolute;left:-9999px;top:0;"></div>
+
+  <!-- Off-screen processing canvases -->
+  <div id="videoElement" style="display:none;"></div>
+  <canvas id="anidrawCanvas" width="1024" height="960" style="position:absolute;left:-2000px;"></canvas>
+  <canvas id="webcamCanvas" width="640" height="480" style="position:absolute;left:-2000px;"></canvas>
+
+  <script>
+    window.onlyScene = 'xrcising_prototype-3';
+  </script>
+
+  <!-- ─── NAV ─── -->
+  <nav class="landing-nav">
+    <div class="landing-nav__left">
+      <a class="landing-nav__logo" href="index.html">xrcising</a>
+      <a class="landing-nav__link landing-nav__link--active" href="index.html">home</a>
+      <a class="landing-nav__link" href="songs/">songs</a>
+      <a class="landing-nav__link" href="rankings/">rankings</a>
+      <a class="landing-nav__link" href="help/">help</a>
+    </div>
+    <div class="landing-nav__right">
+      <div class="lang-picker">
+        <i class="fas fa-globe" style="margin-right:5px;font-size:0.75rem;"></i>English
+        <div class="lang-dropdown">
+          <span class="lang-option">English</span>
+          <span class="lang-option">Español (not yet)</span>
+          <span class="lang-option">Français (not yet)</span>
+          <span class="lang-option">Deutsch (not yet)</span>
+          <span class="lang-option">日本語 (まだまだ)</span>
+          <span class="lang-option">한국어 (not yet)</span>
+          <span class="lang-option">中文 (not yet)</span>
+        </div>
+      </div>
+      <button id="btn-signin" class="btn-signin" onclick="openModal('signin')">sign in</button>
+      
+      <!-- User profile dropdown (hidden until login) -->
+      <div id="user-profile-menu" class="user-profile-menu" style="display:none;">
+        <button class="btn-profile" onclick="toggleUserProfile()">
+          <i class="fas fa-user-circle"></i>
+        </button>
+        <div id="user-dropdown" class="user-dropdown">
+          <a href="stats/" class="user-option">my stats</a>
+          <a href="account/" class="user-option">account</a>
+          <a href="settings/" class="user-option">settings</a>
+          <a href="javascript:void(0)" class="user-option" onclick="logout()">logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── HERO ─── -->
+  <div class="page-content">
+    <section class="hero">
+      <div class="hero__inner">
+        <div class="hero__content">
+          <h1><span>XR</span> fitness experience</h1>
+          <h2>Fully open-source<br>Free to play<br></h2>
+          <div class="hero__stats">
+            <strong>12,847</strong> registered players &mdash;
+            <strong>234</strong> currently active
+          </div>
+          <button class="btn-cta" onclick="openModal('signin')">get started</button>
+        </div>
+
+        <div class="hero__preview-wrap">
+          <div id="vr-preview"></div>
+          <span class="preview-badge">live preview</span>
+          <button class="preview-enter-btn" onclick="enterXR()">enter ar &rsaquo;</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ─── SIGN IN / REGISTER MODAL ─── -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tab-signin" onclick="switchTab('signin')">sign in</button>
+        <button class="modal-tab" id="tab-register" onclick="switchTab('register')">create account</button>
+      </div>
+
+      <div id="form-signin" class="modal-form">
+        <div>
+          <label for="username">username</label>
+          <input type="text" id="username" name="username" autocomplete="username" />
+        </div>
+        <div>
+          <label for="password">password</label>
+          <input type="password" id="password" name="password" autocomplete="current-password" />
+        </div>
+        <div id="login-status" class="modal-status"></div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="login()">sign in</button>
+          <button class="btn-secondary" onclick="closeModal()">cancel</button>
+        </div>
+      </div>
+
+      <div id="form-register" class="modal-form" style="display:none;">
+        <div>
+          <label for="reg-username">username</label>
+          <input type="text" id="reg-username" autocomplete="username" />
+        </div>
+        <div>
+          <label for="reg-password">password (min 8 characters)</label>
+          <input type="password" id="reg-password" autocomplete="new-password" />
+        </div>
+        <div>
+          <label for="reg-confirm">confirm password</label>
+          <input type="password" id="reg-confirm" autocomplete="new-password" />
+        </div>
+        <div id="reg-status" class="modal-status"></div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="register()">register</button>
+          <button class="btn-secondary" onclick="closeModal()">cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="landing-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4>General</h4>
+        <a href="index.html">Home</a>
+        <a href="songs/">Songs</a>
+        <a href="rankings/">Rankings</a>
+      </div>
+      <div class="footer-col">
+        <h4>Help &amp; Support</h4>
+        <a href="help/">FAQ</a>
+        <a href="help/">How to Play</a>
+        <a href="help/">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="#">Terms of Service</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">xrcising &mdash; NYU VR Course 2026</div>
+  </footer>
+
+  <div id="audios" style="display:none;">
+    <audio id="local_webrtc" autoplay></audio>
+  </div>
+
+  <script>
+    // Intercept the dynamically-appended WebGL canvas and move it into the preview container
+    const vrPreview = document.getElementById('vr-preview');
+    const canvasObserver = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
+          if (node.tagName === 'CANVAS' &&
+              node.id !== 'anidrawCanvas' &&
+              node.id !== 'webcamCanvas' &&
+              node.id !== 'textureCanvas') {
+            vrPreview.appendChild(node);
+            canvasObserver.disconnect();
+          }
+        }
+      }
+    });
+    canvasObserver.observe(document.body, { childList: true });
+
+    // Enter AR — clicks the WebXR entry button that handle_scenes.js attaches to #header
+    function enterXR() {
+      const xrBtn = document.querySelector('#header button.webvr-ui-button');
+      if (xrBtn && !xrBtn.disabled) {
+        xrBtn.click();
+      }
+    }
+
+    // Modal helpers
+    function openModal(tab) {
+      document.getElementById('modal-overlay').classList.add('active');
+      switchTab(tab || 'signin');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('active');
+    }
+
+    function switchTab(tab) {
+      const isSignin = tab === 'signin';
+      document.getElementById('tab-signin').classList.toggle('active', isSignin);
+      document.getElementById('tab-register').classList.toggle('active', !isSignin);
+      document.getElementById('form-signin').style.display = isSignin ? 'flex' : 'none';
+      document.getElementById('form-register').style.display = isSignin ? 'none' : 'flex';
+    }
+
+    document.getElementById('modal-overlay').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('modal-overlay')) closeModal();
+    });
+
+    // Auth
+    async function apiPost(path, body) {
+      const res = await fetch(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      let data = {};
+      try { data = await res.json(); } catch (_) {}
+      return { ok: res.ok, data };
+    }
+
+    async function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const status = document.getElementById('login-status');
+      if (!username || !password) {
+        status.style.color = '#ff6b6b';
+        status.textContent = 'Please enter a username and password.';
+        return;
+      }
+      try {
+        const { ok, data } = await apiPost('/api/login', { username, password });
+        status.style.color = ok ? '#6bff8e' : '#ff6b6b';
+        status.textContent = ok ? `Welcome, ${data.username}!` : (data.error || 'Login failed.');
+        
+        if (ok) {
+          localStorage.setItem('xrcising_username', data.username);
+          window.sharedState = window.sharedState || {};
+          window.sharedState.username = data.username;
+          closeModal();
+          document.getElementById('btn-signin').style.display = 'none';
+          document.getElementById('user-profile-menu').style.display = 'block';
+        }
+      } catch (e) {
+        status.style.color = '#ff6b6b';
+        status.textContent = `Error: ${e.message}`;
+      }
+    }
+
+    async function register() {
+      const username = document.getElementById('reg-username').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const confirm = document.getElementById('reg-confirm').value;
+      const status = document.getElementById('reg-status');
+      if (!username || !password || !confirm) { status.textContent = 'All fields are required.'; return; }
+      if (password.length < 8) { status.textContent = 'Password must be at least 8 characters.'; return; }
+      if (password !== confirm) { status.textContent = 'Passwords do not match.'; return; }
+      try {
+        const { ok, data } = await apiPost('/api/register', { username, password });
+        if (ok) {
+          closeModal();
+          const loginStatus = document.getElementById('login-status');
+          loginStatus.style.color = '#6bff8e';
+          loginStatus.textContent = 'Account created! You can now sign in.';
+          switchTab('signin');
+          openModal('signin');
+        } else {
+          status.style.color = '#ff6b6b';
+          status.textContent = data.error || 'Registration failed.';
+        }
+      } catch (e) {
+        status.style.color = '#ff6b6b';
+        status.textContent = `Error: ${e.message}`;
+      }
+    }
+
+    function toggleUserProfile() {
+      const dropdown = document.getElementById('user-dropdown');
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function logout() {
+      localStorage.removeItem('xrcising_username');
+      if (window.sharedState) window.sharedState.username = null;
+      document.getElementById('btn-signin').style.display = 'inline-block';
+      document.getElementById('user-profile-menu').style.display = 'none';
+      document.getElementById('user-dropdown').style.display = 'none';
+    }
+
+    // Close user dropdown if clicked outside
+    document.addEventListener('click', (e) => {
+      const profileMenu = document.getElementById('user-profile-menu');
+      if (profileMenu && !profileMenu.contains(e.target)) {
+        const dropdown = document.getElementById('user-dropdown');
+        if (dropdown) dropdown.style.display = 'none';
+      }
+    });
+
+    // Restore auth state on page load
+    (function() {
+      const saved = localStorage.getItem('xrcising_username');
+      if (saved) {
+        window.sharedState = window.sharedState || {};
+        window.sharedState.username = saved;
+        document.getElementById('btn-signin').style.display = 'none';
+        document.getElementById('user-profile-menu').style.display = 'block';
+      }
+    })();
+
+    // Legacy shims
+    function openCreateAccount() { openModal('register'); }
+    function closeCreateAccount() { closeModal(); }
+  </script>
+
+  <script type="module" src="../js/main.js"></script>
+</body>
+</html>

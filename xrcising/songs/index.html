@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png" />
+  <link rel="stylesheet" href="../landing.css" />
+  <link rel="stylesheet" href="songs.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <title>songs &mdash; xrcising</title>
+</head>
+<body>
+
+  <!-- ─── NAV ─── -->
+  <nav class="landing-nav">
+    <div class="landing-nav__left">
+      <a class="landing-nav__logo" href="../">xrcising</a>
+      <a class="landing-nav__link" href="../">home</a>
+      <a class="landing-nav__link landing-nav__link--active" href="../songs/">songs</a>
+      <a class="landing-nav__link" href="../rankings/">rankings</a>
+      <a class="landing-nav__link" href="../help/">help</a>
+    </div>
+    <div class="landing-nav__right">
+      <div class="lang-picker">
+        <i class="fas fa-globe" style="margin-right:5px;font-size:0.75rem;"></i>English
+        <div class="lang-dropdown">
+          <span class="lang-option">English</span>
+          <span class="lang-option">Español</span>
+          <span class="lang-option">Français</span>
+          <span class="lang-option">Deutsch</span>
+          <span class="lang-option">日本語</span>
+          <span class="lang-option">한국어</span>
+          <span class="lang-option">中文</span>
+        </div>
+      </div>
+      <button id="btn-signin" class="btn-signin" onclick="openModal('signin')">sign in</button>
+      <div id="user-profile-menu" class="user-profile-menu" style="display:none;">
+        <button class="btn-profile" onclick="toggleUserProfile()">
+          <i class="fas fa-user-circle"></i>
+        </button>
+        <div id="user-dropdown" class="user-dropdown">
+          <a href="../stats/" class="user-option">my stats</a>
+          <a href="../account/" class="user-option">account</a>
+          <a href="../settings/" class="user-option">settings</a>
+          <a href="javascript:void(0)" class="user-option" onclick="logout()">logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-content">
+    <div class="page-header">
+      <div class="page-header__inner">
+        <h1><span>song</span> listing</h1>
+        <p>browse and play tracks in vr &mdash; each song becomes a full-body workout</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="search-bar">
+        <input class="search-input" type="text" placeholder="search songs, artists..." />
+      </div>
+
+      <div class="song-grid">
+        <div class="song-card">
+          <div class="song-card__title">Neon Rush</div>
+          <div class="song-card__artist">DJ Pulse</div>
+          <div class="song-card__meta">
+            <span class="tag">Hard</span>
+            <span class="tag tag--bpm">128 BPM</span>
+          </div>
+        </div>
+        <div class="song-card">
+          <div class="song-card__title">Skybreak</div>
+          <div class="song-card__artist">Lunar Orbit</div>
+          <div class="song-card__meta">
+            <span class="tag">Medium</span>
+            <span class="tag tag--bpm">110 BPM</span>
+          </div>
+        </div>
+        <div class="song-card">
+          <div class="song-card__title">Electric Avenue</div>
+          <div class="song-card__artist">Vexon</div>
+          <div class="song-card__meta">
+            <span class="tag">Easy</span>
+            <span class="tag tag--bpm">95 BPM</span>
+          </div>
+        </div>
+        <div class="song-card">
+          <div class="song-card__title">Hypercore</div>
+          <div class="song-card__artist">Bass Protocol</div>
+          <div class="song-card__meta">
+            <span class="tag">Expert</span>
+            <span class="tag tag--bpm">175 BPM</span>
+          </div>
+        </div>
+        <div class="song-card">
+          <div class="song-card__title">Morning Flow</div>
+          <div class="song-card__artist">Solaris</div>
+          <div class="song-card__meta">
+            <span class="tag">Easy</span>
+            <span class="tag tag--bpm">88 BPM</span>
+          </div>
+        </div>
+        <div class="song-card">
+          <div class="song-card__title">Fracture Point</div>
+          <div class="song-card__artist">Null Vector</div>
+          <div class="song-card__meta">
+            <span class="tag">Hard</span>
+            <span class="tag tag--bpm">145 BPM</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SIGN IN MODAL ─── -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tab-signin" onclick="switchTab('signin')">sign in</button>
+        <button class="modal-tab" id="tab-register" onclick="switchTab('register')">create account</button>
+      </div>
+      <div id="form-signin" class="modal-form">
+        <div>
+          <label for="username">username</label>
+          <input type="text" id="username" autocomplete="username" />
+        </div>
+        <div>
+          <label for="password">password</label>
+          <input type="password" id="password" autocomplete="current-password" />
+        </div>
+        <div id="login-status" class="modal-status"></div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="login()">sign in</button>
+          <button class="btn-secondary" onclick="closeModal()">cancel</button>
+        </div>
+      </div>
+      <div id="form-register" class="modal-form" style="display:none;">
+        <div>
+          <label for="reg-username">username</label>
+          <input type="text" id="reg-username" autocomplete="username" />
+        </div>
+        <div>
+          <label for="reg-password">password (min 8 characters)</label>
+          <input type="password" id="reg-password" autocomplete="new-password" />
+        </div>
+        <div>
+          <label for="reg-confirm">confirm password</label>
+          <input type="password" id="reg-confirm" autocomplete="new-password" />
+        </div>
+        <div id="reg-status" class="modal-status"></div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="register()">register</button>
+          <button class="btn-secondary" onclick="closeModal()">cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="landing-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4>General</h4>
+        <a href="../">Home</a>
+        <a href="../songs/">Songs</a>
+        <a href="../rankings/">Rankings</a>
+      </div>
+      <div class="footer-col">
+        <h4>Help &amp; Support</h4>
+        <a href="../help/">FAQ</a>
+        <a href="../help/">How to Play</a>
+        <a href="../help/">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="#">Terms of Service</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">xrcising &mdash; NYU VR Course 2026</div>
+  </footer>
+
+  <script>
+    function openModal(tab) {
+      document.getElementById('modal-overlay').classList.add('active');
+      switchTab(tab || 'signin');
+    }
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('active');
+    }
+    function switchTab(tab) {
+      const isSignin = tab === 'signin';
+      document.getElementById('tab-signin').classList.toggle('active', isSignin);
+      document.getElementById('tab-register').classList.toggle('active', !isSignin);
+      document.getElementById('form-signin').style.display = isSignin ? 'flex' : 'none';
+      document.getElementById('form-register').style.display = isSignin ? 'none' : 'flex';
+    }
+    document.getElementById('modal-overlay').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('modal-overlay')) closeModal();
+    });
+
+    function toggleUserProfile() {
+      const d = document.getElementById('user-dropdown');
+      d.style.display = d.style.display === 'block' ? 'none' : 'block';
+    }
+    function logout() {
+      localStorage.removeItem('xrcising_username');
+      window.location.href = '../';
+    }
+    document.addEventListener('click', e => {
+      const m = document.getElementById('user-profile-menu');
+      if (m && !m.contains(e.target)) {
+        const d = document.getElementById('user-dropdown');
+        if (d) d.style.display = 'none';
+      }
+    });
+
+    async function apiPost(path, body) {
+      const res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      let data = {};
+      try { data = await res.json(); } catch (_) {}
+      return { ok: res.ok, data };
+    }
+
+    async function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const status = document.getElementById('login-status');
+      if (!username || !password) { status.style.color = '#ff6b6b'; status.textContent = 'Please enter a username and password.'; return; }
+      try {
+        const { ok, data } = await apiPost('/api/login', { username, password });
+        if (ok) {
+          localStorage.setItem('xrcising_username', data.username);
+          closeModal();
+          document.getElementById('btn-signin').style.display = 'none';
+          document.getElementById('user-profile-menu').style.display = 'block';
+        } else {
+          status.style.color = '#ff6b6b';
+          status.textContent = data.error || 'Login failed.';
+        }
+      } catch (e) { status.style.color = '#ff6b6b'; status.textContent = `Error: ${e.message}`; }
+    }
+
+    async function register() {
+      const username = document.getElementById('reg-username').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const confirm = document.getElementById('reg-confirm').value;
+      const status = document.getElementById('reg-status');
+      if (!username || !password || !confirm) { status.textContent = 'All fields are required.'; return; }
+      if (password.length < 8) { status.textContent = 'Password must be at least 8 characters.'; return; }
+      if (password !== confirm) { status.textContent = 'Passwords do not match.'; return; }
+      try {
+        const { ok, data } = await apiPost('/api/register', { username, password });
+        if (ok) {
+          localStorage.setItem('xrcising_username', username);
+          closeModal();
+          document.getElementById('btn-signin').style.display = 'none';
+          document.getElementById('user-profile-menu').style.display = 'block';
+        } else { status.style.color = '#ff6b6b'; status.textContent = data.error || 'Registration failed.'; }
+      } catch (e) { status.style.color = '#ff6b6b'; status.textContent = `Error: ${e.message}`; }
+    }
+
+    // Restore auth state on load
+    (function () {
+      const saved = localStorage.getItem('xrcising_username');
+      if (saved) {
+        document.getElementById('btn-signin').style.display = 'none';
+        document.getElementById('user-profile-menu').style.display = 'block';
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png" />
+  <link rel="stylesheet" href="../landing.css" />
+  <link rel="stylesheet" href="settings.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <title>settings &mdash; xrcising</title>
+</head>
+<body>
+
+  <nav class="landing-nav">
+    <div class="landing-nav__left">
+      <a class="landing-nav__logo" href="../">xrcising</a>
+      <a class="landing-nav__link" href="../">home</a>
+      <a class="landing-nav__link" href="../songs/">songs</a>
+      <a class="landing-nav__link" href="../rankings/">rankings</a>
+      <a class="landing-nav__link" href="../help/">help</a>
+    </div>
+    <div class="landing-nav__right">
+      <div class="lang-picker">
+        <i class="fas fa-globe" style="margin-right:5px;font-size:0.75rem;"></i>English
+        <div class="lang-dropdown">
+          <span class="lang-option">English</span>
+          <span class="lang-option">Español (not yet)</span>
+          <span class="lang-option">Français (not yet)</span>
+          <span class="lang-option">Deutsch (not yet)</span>
+          <span class="lang-option">日本語 (まだまだ)</span>
+          <span class="lang-option">한국어 (not yet)</span>
+          <span class="lang-option">中文 (not yet)</span>
+        </div>
+      </div>
+      <button id="btn-signin" class="btn-signin" onclick="openModal('signin')">sign in</button>
+      <div id="user-profile-menu" class="user-profile-menu" style="display:none;">
+        <button class="btn-profile" onclick="toggleUserProfile()">
+          <i class="fas fa-user-circle"></i>
+        </button>
+        <div id="user-dropdown" class="user-dropdown">
+          <a href="../stats/" class="user-option">my stats</a>
+          <a href="../account/" class="user-option">account</a>
+          <a href="../settings/" class="user-option">settings</a>
+          <a href="javascript:void(0)" class="user-option" onclick="logout()">logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-content">
+    <div class="page-header">
+      <div class="page-header__inner">
+        <h1>account <span>settings</span></h1>
+        <p>manage your password and account security</p>
+      </div>
+    </div>
+
+    <div id="auth-gate" class="auth-gate" style="display:none;">
+      <h2>sign in to view settings</h2>
+      <p>you need to be signed in to access this page</p>
+      <button class="btn-cta" onclick="openModal('signin')">sign in</button>
+    </div>
+
+    <div id="settings-content" class="section" style="display:none;">
+      <div class="settings-max">
+
+        <div class="settings-card">
+          <h3>change password</h3>
+          <div class="card-desc">choose a strong password of at least 8 characters</div>
+          <div class="form-field">
+            <label>current password</label>
+            <input type="password" id="cur-password" autocomplete="current-password" />
+          </div>
+          <div class="form-field">
+            <label>new password</label>
+            <input type="password" id="new-password" autocomplete="new-password" />
+          </div>
+          <div class="form-field">
+            <label>confirm new password</label>
+            <input type="password" id="confirm-password" autocomplete="new-password" />
+          </div>
+          <div class="action-row">
+            <button class="btn-primary" onclick="changePassword()" style="flex:none;padding:0.6rem 1.6rem;">update password</button>
+            <span class="status-msg" id="pw-status"></span>
+          </div>
+        </div>
+
+        <div class="settings-card danger-card">
+          <h3><i class="fas fa-triangle-exclamation" style="margin-right:0.4rem;font-size:0.85rem;"></i>warning</h3>
+          <div class="card-desc">permanently delete your account and all associated data. this cannot be undone.</div>
+          <button class="btn-danger" onclick="openDeleteConfirm()">delete my account</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete account confirmation -->
+  <div id="confirm-backdrop" class="confirm-backdrop">
+    <div class="confirm-box">
+      <h3><i class="fas fa-triangle-exclamation" style="margin-right:0.4rem;"></i>delete account</h3>
+      <p>this will permanently erase your account, stats, and all data. enter your password to confirm.</p>
+      <div class="form-field">
+        <label>your password</label>
+        <input type="password" id="delete-password" autocomplete="current-password" placeholder="enter password to confirm" />
+      </div>
+      <div id="delete-status" class="status-msg" style="margin-bottom:0.85rem;min-height:1.1rem;"></div>
+      <div class="modal-actions">
+        <button class="btn-danger" onclick="deleteAccount()" style="border-radius:7px;padding:0.6rem;">yes, delete everything</button>
+        <button class="btn-secondary" onclick="closeDeleteConfirm()">cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tab-signin" onclick="switchTab('signin')">sign in</button>
+        <button class="modal-tab" id="tab-register" onclick="switchTab('register')">create account</button>
+      </div>
+      <div id="form-signin" class="modal-form">
+        <div><label for="username">username</label><input type="text" id="username" autocomplete="username" /></div>
+        <div><label for="password">password</label><input type="password" id="password" autocomplete="current-password" /></div>
+        <div id="login-status" class="modal-status"></div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="login()">sign in</button>
+          <button class="btn-secondary" onclick="closeModal()">cancel</button>
+        </div>
+      </div>
+      <div id="form-register" class="modal-form" style="display:none;">
+        <div><label for="reg-username">username</label><input type="text" id="reg-username" autocomplete="username" /></div>
+        <div><label for="reg-password">password (min 8 characters)</label><input type="password" id="reg-password" autocomplete="new-password" /></div>
+        <div><label for="reg-confirm">confirm password</label><input type="password" id="reg-confirm" autocomplete="new-password" /></div>
+        <div id="reg-status" class="modal-status"></div>
+        <div class="modal-actions">
+          <button class="btn-primary" onclick="register()">register</button>
+          <button class="btn-secondary" onclick="closeModal()">cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="landing-footer">
+    <div class="footer-inner">
+      <div class="footer-col"><h4>General</h4><a href="../">Home</a><a href="../songs/">Songs</a><a href="../rankings/">Rankings</a></div>
+      <div class="footer-col"><h4>Help &amp; Support</h4><a href="../help/">FAQ</a><a href="../help/">How to Play</a><a href="../help/">Contact</a></div>
+      <div class="footer-col"><h4>Legal</h4><a href="#">Terms of Service</a><a href="#">Privacy Policy</a></div>
+    </div>
+    <div class="footer-bottom">xrcising &mdash; NYU VR Course 2026</div>
+  </footer>
+
+  <script>
+    async function apiPost(path, body) {
+      const res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      let data = {}; try { data = await res.json(); } catch (_) {}
+      return { ok: res.ok, data };
+    }
+    function openModal(tab) { document.getElementById('modal-overlay').classList.add('active'); switchTab(tab || 'signin'); }
+    function closeModal() { document.getElementById('modal-overlay').classList.remove('active'); }
+    function switchTab(tab) {
+      const s = tab === 'signin';
+      document.getElementById('tab-signin').classList.toggle('active', s);
+      document.getElementById('tab-register').classList.toggle('active', !s);
+      document.getElementById('form-signin').style.display = s ? 'flex' : 'none';
+      document.getElementById('form-register').style.display = s ? 'none' : 'flex';
+    }
+    document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target === document.getElementById('modal-overlay')) closeModal(); });
+
+    async function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const status = document.getElementById('login-status');
+      if (!username || !password) { status.style.color = '#ff6b6b'; status.textContent = 'Please enter a username and password.'; return; }
+      try {
+        const { ok, data } = await apiPost('/api/login', { username, password });
+        if (ok) { localStorage.setItem('xrcising_username', data.username); window.location.reload(); }
+        else { status.style.color = '#ff6b6b'; status.textContent = data.error || 'Login failed.'; }
+      } catch (e) { status.style.color = '#ff6b6b'; status.textContent = `Error: ${e.message}`; }
+    }
+    async function register() {
+      const username = document.getElementById('reg-username').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const confirm = document.getElementById('reg-confirm').value;
+      const status = document.getElementById('reg-status');
+      if (!username || !password || !confirm) { status.textContent = 'All fields are required.'; return; }
+      if (password.length < 8) { status.textContent = 'Password must be at least 8 characters.'; return; }
+      if (password !== confirm) { status.textContent = 'Passwords do not match.'; return; }
+      try {
+        const { ok, data } = await apiPost('/api/register', { username, password });
+        if (ok) { localStorage.setItem('xrcising_username', username); window.location.reload(); }
+        else { status.style.color = '#ff6b6b'; status.textContent = data.error || 'Registration failed.'; }
+      } catch (e) { status.style.color = '#ff6b6b'; status.textContent = `Error: ${e.message}`; }
+    }
+    function toggleUserProfile() { const d = document.getElementById('user-dropdown'); d.style.display = d.style.display === 'block' ? 'none' : 'block'; }
+    function logout() { localStorage.removeItem('xrcising_username'); window.location.href = '../'; }
+    document.addEventListener('click', e => {
+      const m = document.getElementById('user-profile-menu');
+      if (m && !m.contains(e.target)) { const d = document.getElementById('user-dropdown'); if (d) d.style.display = 'none'; }
+    });
+
+    // ── Page logic ──
+    const loggedInUser = localStorage.getItem('xrcising_username');
+
+    if (!loggedInUser) {
+      document.getElementById('auth-gate').style.display = 'block';
+    } else {
+      document.getElementById('btn-signin').style.display = 'none';
+      document.getElementById('user-profile-menu').style.display = 'block';
+      document.getElementById('settings-content').style.display = 'block';
+    }
+
+    async function changePassword() {
+      const cur = document.getElementById('cur-password').value;
+      const nw = document.getElementById('new-password').value;
+      const cf = document.getElementById('confirm-password').value;
+      const status = document.getElementById('pw-status');
+      if (!cur || !nw || !cf) { status.style.color = '#ff6b6b'; status.textContent = 'All fields required.'; return; }
+      if (nw.length < 8) { status.style.color = '#ff6b6b'; status.textContent = 'New password must be at least 8 characters.'; return; }
+      if (nw !== cf) { status.style.color = '#ff6b6b'; status.textContent = 'Passwords do not match.'; return; }
+      status.textContent = 'updating...'; status.style.color = 'rgba(255,255,255,0.4)';
+      try {
+        const res = await fetch(`/api/user/${encodeURIComponent(loggedInUser)}/password`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ currentPassword: cur, newPassword: nw })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          status.style.color = '#6bff8e'; status.textContent = 'password updated!';
+          document.getElementById('cur-password').value = '';
+          document.getElementById('new-password').value = '';
+          document.getElementById('confirm-password').value = '';
+          setTimeout(() => status.textContent = '', 3000);
+        } else { status.style.color = '#ff6b6b'; status.textContent = data.error || 'failed to update password'; }
+      } catch (e) { status.style.color = '#ff6b6b'; status.textContent = `Error: ${e.message}`; }
+    }
+
+    function openDeleteConfirm() {
+      document.getElementById('delete-password').value = '';
+      document.getElementById('delete-status').textContent = '';
+      document.getElementById('confirm-backdrop').classList.add('active');
+    }
+    function closeDeleteConfirm() { document.getElementById('confirm-backdrop').classList.remove('active'); }
+
+    async function deleteAccount() {
+      const password = document.getElementById('delete-password').value;
+      const status = document.getElementById('delete-status');
+      if (!password) { status.style.color = '#ff6b6b'; status.textContent = 'Please enter your password.'; return; }
+      try {
+        const res = await fetch(`/api/user/${encodeURIComponent(loggedInUser)}`, {
+          method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          localStorage.removeItem('xrcising_username');
+          window.location.href = '../';
+        } else { status.style.color = '#ff6b6b'; status.textContent = data.error || 'Failed to delete account.'; }
+      } catch (e) { status.style.color = '#ff6b6b'; status.textContent = `Error: ${e.message}`; }
+    }
+  </script>
+</body>
+</html>

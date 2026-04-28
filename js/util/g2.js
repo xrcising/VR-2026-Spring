@@ -54,12 +54,13 @@ export function G2(do_not_animate_flag=false, canvasWidth=512, canvasHeight) {
 
    this.setAnimate = true_or_false => { txtrCanvas._animate = true_or_false; return this; }
 
-   this.addWidget = (obj, type, x, y, color, label, action, size) => {
+   this.addWidget = (obj, type, x, y, color, label, action, size, W, H) => {
       switch (type) {
-      case 'button'  : widgets.push(new Button  (obj, x, y, color, label, action, size)); break;
-      case 'slider'  : widgets.push(new Slider  (obj, x, y, color, label, action, size)); break;
-      case 'textbox' : widgets.push(new Textbox (obj, x, y, color, label, action, size)); break;
-      case 'trackpad': widgets.push(new Trackpad(obj, x, y, color, label, action, size)); break;
+      case 'button'     : widgets.push(new Button     (obj, x, y, color, label, action, size, W, H)); break;
+      case 'slider'     : widgets.push(new Slider     (obj, x, y, color, label, action, size)); break;
+      case 'textbox'    : widgets.push(new Textbox    (obj, x, y, color, label, action, size)); break;
+      case 'trackpad'   : widgets.push(new Trackpad   (obj, x, y, color, label, action, size)); break;
+      case 'colorpicker': widgets.push(new ColorPicker(obj, x, y, color, label, action, size)); break;
       }
       return widgets[widgets.length - 1];
    }
@@ -139,18 +140,21 @@ export function G2(do_not_animate_flag=false, canvasWidth=512, canvasHeight) {
       g2.fillRect(x+w/2, y-h/2+s, s, h);
    }
 
-   let Button = function(obj, x, y, color, label, action, size) {
+   let Button = function(obj, x, y, color, label, action, size, W, H) {
       size = cg.def(size, 1);
       this.obj = obj;
       this.state = 0;
-      g2.textHeight(.09 * size);
-      let w = textWidth(label[0]) + .02 * size, h = .1 * size;
+      g2.textHeight(.07 * size);
+      let w = W !== undefined ? W : textWidth(label[0]) + .02 * size; // <-- modification to pass custom width and height of button
+      let h = H !== undefined ? H : .1 * size; // <-- modification to pass custom width and height of button
       this.setLabel = str => label = str;
       this.isWithin = () => {
+         if (Array.isArray(label) ? !label[this.state] : !label) return false;
          let uvz = g2.getUVZ(obj);
          return uvz && uvz[0] > x-w/2 && uvz[0] < x+w/2 && uvz[1] > y-h/2 && uvz[1] < y+h/2;
       }
       this.handleEvent = () => {
+         if (Array.isArray(label) ? !label[this.state] : !label) return;
          if (action && mouseState == 'release' && this.isWithin()) {
             action();
             activeWidget = null;
@@ -159,13 +163,23 @@ export function G2(do_not_animate_flag=false, canvasWidth=512, canvasHeight) {
          }
       }
       this.draw = () => {
-         w = textWidth(label[this.state]) + .02 * size;
+         let currentLabel = Array.isArray(label) ? label[this.state] : label;
+         if (!currentLabel) return; // Do not draw if label is empty
+         
+         if (W === undefined) w = textWidth(currentLabel) + .2 * size;
+         let isHovered = this.isWithin();
          let isPressed = this == activeWidget && (mouseState == 'press' || mouseState == 'drag');
-         g2.textHeight(.045 * size);
-         g2.setColor(color, isPressed ? .5 : this.isWithin() ? .7 : 1);
+         
+         if (isHovered && !this._wasHovered && window.vibrate) {
+            window.vibrate(activeHand || 'right', 0.4);
+         }
+         this._wasHovered = isHovered;
+
+         g2.textHeight(.035 * size);
+         g2.setColor(color, isPressed ? .5 : isHovered ? .7 : 1);
          g2.fillRect(x-w/2, y-h/2, w, h);
          g2.setColor('black');
-         g2.text(Array.isArray(label) ? label[this.state] : label, x, y, 'center');
+         g2.text(currentLabel, x, y, 'center');
          drawWidgetOutline(x,y,w,h, isPressed);
       }
    }
@@ -296,6 +310,55 @@ export function G2(do_not_animate_flag=false, canvasWidth=512, canvasHeight) {
       }
    }
 
+   let ColorPicker = function(obj, x, y, color, label, action, size) {
+      size = cg.def(size, 1);
+      this.obj = obj;
+      let value = [0.5, 0.5];
+      let w = .5 * size, h = .5 * size;
+      
+      this.isWithin = () => {
+         let uvz = g2.getUVZ(obj);
+         return uvz && uvz[0] > x-w/2 && uvz[0] < x+w/2 && uvz[1] > y-h/2 && uvz[1] < y+h/2;
+      }
+      
+      this.handleEvent = () => {
+         let uvz = g2.getUVZ(obj);
+         if (uvz) {
+            value[0] = Math.max(0, Math.min(1, (uvz[0] - (x-w/2)) / w));
+            value[1] = Math.max(0, Math.min(1, (uvz[1] - (y-h/2)) / h));
+            if (action && mouseState == 'drag') action(value);
+         }
+      }
+      
+      this.draw = () => {
+         let isPressed = this == activeWidget && (mouseState == 'press' || mouseState == 'drag');
+         context.save();
+         let gradH = context.createLinearGradient(x2c(x-w/2), 0, x2c(x+w/2), 0);
+         gradH.addColorStop(0,   '#ff0000'); // Red
+         gradH.addColorStop(1/6, '#ffff00'); // Yellow
+         gradH.addColorStop(2/6, '#00ff00'); // Green
+         gradH.addColorStop(3/6, '#00ffff'); // Cyan
+         gradH.addColorStop(4/6, '#0000ff'); // Blue
+         gradH.addColorStop(5/6, '#ff00ff'); // Magenta
+         gradH.addColorStop(1,   '#ff0000'); // Red
+         context.fillStyle = gradH;
+         g2.fillRect(x-w/2, y-h/2, w, h);
+         let gradS = context.createLinearGradient(0, y2c(y-h/2), 0, y2c(y+h/2));
+         gradS.addColorStop(0, 'rgba(255, 255, 255, 1)'); // White at the bottom
+         gradS.addColorStop(1, 'rgba(255, 255, 255, 0)'); // Transparent at the top
+         context.fillStyle = gradS;
+         g2.fillRect(x-w/2, y-h/2, w, h);
+         context.restore();
+         g2.setColor('black');
+         g2.fillRect(x-w/2 + w*value[0] - .005 * size, y-h/2, .01 * size, h);
+         g2.fillRect(x-w/2, y-h/2 + h*value[1] - .005 * size, w, .01 * size);
+         g2.textHeight(.09 * size);
+         g2.setColor('black');
+         g2.text(label, x, y + .7 * w, 'center');
+         drawWidgetOutline(x, y, w, h, isPressed);
+      }
+   }
+
    let sCurve = t => t * t * (3 - t - t);
    let lerp = (t,a,b) => a + t * (b - a);
    let noise2P = [], noise2U = [], noise2V = [];
@@ -401,6 +464,8 @@ export function G2(do_not_animate_flag=false, canvasWidth=512, canvasHeight) {
       else {
          let L = lcb.hitRect(objMatrix);
          let R = rcb.hitRect(objMatrix);
+         if (L && !R) activeHand = 'left';
+         else if (R && !L) activeHand = 'right';
          return L ? L : R ? R : null;
       }
    }
@@ -625,6 +690,32 @@ export function G2(do_not_animate_flag=false, canvasWidth=512, canvasHeight) {
          clockHand(.042, (hour   + minute / 60) / 12, .49);
          clockHand(.027, (minute + second / 60) / 60, .64);
          clockHand(.018,           second / 60      , .84);
+      context.restore();
+      return this;
+   }
+
+   this.icon = (code, x, y, size, alignment, rotation) => {
+      context.save();
+      size = size || _h;
+      context.font = '900 ' + ((10 * height * size >> 0)/10) + 'px "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome"';
+      
+      let dy = 2 * parseFloat(context.font) / height;
+      if (alignment) context.textAlign = alignment;
+
+      let text = typeof code === 'string' && code.length > 1 ? String.fromCharCode(parseInt(code, 16)) : code;
+      
+      let dx = 0;
+      if (alignment == 'left' || alignment == 'right') {
+         dx = textWidth(text);
+         if (alignment == 'right') dx = -dx;
+      }
+
+      context.translate(x2c(x), y2c(y-dy/4));
+      if (rotation) context.rotate(-Math.PI/2 * rotation);
+
+      context.lineWidth = 1.5;
+      context.fillText(text, w2c(-dx/2), 0);
+      context.strokeText(text, w2c(-dx/2), 0);
       context.restore();
       return this;
    }

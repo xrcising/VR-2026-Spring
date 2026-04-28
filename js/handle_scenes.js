@@ -167,7 +167,7 @@ const addDemoButtons = (demoNames, scenesInit) => {
    }
 
    if (window.onlyScene)
-      header.style.maxWidth = '176px';
+      header.style.maxWidth = '276px';
 
    if (! window.onlyScene)
       header.innerHTML += `
